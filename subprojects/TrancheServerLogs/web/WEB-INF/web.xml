@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    <servlet>
+        <servlet-name>PerformanceChartRenderer</servlet-name>
+        <servlet-class>org.proteomecommons.tranche.serverlogs.PerformanceChartRenderer</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ServerSpaceChartRenderer</servlet-name>
+        <servlet-class>org.proteomecommons.tranche.serverlogs.ServerSpaceChartRenderer</servlet-class>
+    </servlet>
+    <servlet>
+        <description>Renderers replications of chunks for one or all projects.</description>
+        <servlet-name>ReplicationsChartRenderer</servlet-name>
+        <servlet-class>org.proteomecommons.tranche.serverlogs.ReplicationsChartRenderer</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StressTestResultsChartRenderer</servlet-name>
+        <servlet-class>org.proteomecommons.tranche.serverlogs.StressTestResultsChartRenderer</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PerformanceChartRenderer</servlet-name>
+        <url-pattern>/server-bandwidth-chart.png</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ServerSpaceChartRenderer</servlet-name>
+        <url-pattern>/server-disk-chart.png</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReplicationsChartRenderer</servlet-name>
+        <url-pattern>/replications-chart.png</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StressTestResultsChartRenderer</servlet-name>
+        <url-pattern>/stress-results.png</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+    <welcome-file-list>
+	<welcome-file>
+            index.jsp
+        </welcome-file>
+    </welcome-file-list>
+</web-app>

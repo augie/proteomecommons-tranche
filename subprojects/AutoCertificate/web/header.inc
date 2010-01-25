@@ -1,0 +1,1 @@
+<%@page contentType="text/html"%><%@page pageEncoding="UTF-8"%><%@page import="java.io.*"%><%@page import="java.util.*"%><%@page import="autocert.model.*"%><%@page import="autocert.view.*"%><%@page import="autocert.controller.*"%><%@page import="org.tranche.users.*"%><%@page import="captchas.CaptchasDotNet"%>

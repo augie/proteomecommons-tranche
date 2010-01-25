@@ -1,0 +1,99 @@
+<!-- 
+
+ This is the ant build script for this sub-project. It is designed to automate
+ several tedious tasks related to the codebase such as compiling, building a
+ distribution, and cleaning up generated files.
+
+-->
+<project name="PeptideAtlas bridge for the ProteomeCommons.org DFS" default="dist" basedir=".">
+    <description>
+        This is the build script for building this sub-project.
+    </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="test" location="test"/>	
+  <property name="build" location="build"/>
+  <property name="lib"  location="lib"/>
+  <property name="dir.rt.build" location="${build}/rt"/>
+
+  <!-- JUnit parameters -->
+  <property name="dir.test.build" location="${build}/test"/>
+  <property name="dir.test.results" location="${build}/junit/raw"/>
+  <property name="dir.test.reports" location="${dist.website}/dev/junit"/>
+
+  <!-- load properties from build.properties -->
+  <property file="../../build.properties" />
+
+  <!-- path required for runtime compiling-->
+  <path id="path.rt.compile">
+    <!-- Add all the JARs required for runtime --> 
+    <fileset dir="${lib}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- path required for building the test code-->
+  <path id="path.test.compile">
+    <!-- keep everything from the runtime compile path -->
+    <path refid="path.rt.compile"/>
+    <!-- set the path to be the build dir -->
+    <pathelement path="${dir.rt.build}"/>
+  </path>
+
+  <!-- path required for testing the runtime code -->
+  <path id="path.test.rt">
+    <!-- keep everything from the test compile -->
+	  <path refid="path.test.compile"/>
+	  <pathelement path="${dir.test.build}"/>
+	  <pathelement path="${ant.home}/lib/clover.jar"/>
+	  <pathelement path="./clover.license"/>
+  </path>
+
+  <!-- Initializes the build directories -->
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+    <mkdir dir="${dir.rt.build}"/>
+    <mkdir dir="${dir.test.build}"/>
+    <mkdir dir="${dir.test.results}"/>
+    <mkdir dir="${dir.test.reports}"/>
+    
+    <!-- copy all the source-code over and auto-replace text -->
+  </target>
+
+  <!-- Compiles all the code required for runtime -->
+  <target name="rt.compile" depends="init" description="compile the source">
+        <!-- compile all the code -->
+	<javac srcdir="${src}" destdir="${dir.rt.build}" debug="true" source="1.5">
+		<classpath refid="path.rt.compile"/>
+	</javac>
+	
+	<!-- copy all non-java files from src to dest dir -->
+	<copy todir="${dir.rt.build}">
+	  <fileset dir="${src}">
+	    <exclude name="**/*.java"/>	
+	  </fileset>
+	</copy>
+
+        <!-- make a JAR representing the project's code -->
+        <jar jarfile="Mirror-PeptideAtlas.jar" basedir="${dir.rt.build}"/>
+  </target>
+
+  <!-- Compiles all the code required for a test -->
+  <target name="test.compile" depends="init, rt.compile"
+		  description="compile the tests and test support types">
+	<javac srcdir="${test}" destdir="${dir.test.build}" debug="true" source="1.5">
+		<classpath refid="path.test.compile"/>
+	</javac>
+
+	<!-- copy all non-java files from test to dest dir -->
+	<copy todir="${dir.test.build}">
+	  <fileset dir="${test}">
+	    <exclude name="**/*.java"/>	
+	  </fileset>
+	</copy>
+  </target>
+
+</project>

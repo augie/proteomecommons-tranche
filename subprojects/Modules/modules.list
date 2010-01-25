@@ -1,0 +1,53 @@
+# If a hash is unknown, just put a place holder like --UKNOWN-- (anything will
+# work). Skip a line b/w JARs for readability.
+
+# Advance search loads by default, but leave it here for completeness.
+#AdvancedSearchModule.jar
+#Advanced Search Module
+#Search the ProteomeCommons.org database for projects to download, view, etc. Should load by default.
+#B7e2Se0ozsdpZtnEwa3g0HLj41AaSPUdS9HwmB8eqzFo8PZ5ilCrQ0LCv6n5yNDNJKaczaS8Qz+7p0TamFWOzw3DDjgAAAAAAACJ+w==
+
+ProteomeCommons.org-Tranche_DataPageAndAnnotationModule.jar
+ProteomeCommons.org Data and Annotations Module
+Allows user to quickly find data page for data, or annotate data. Launches page from browser.
+JCeiUNTBlQ2FbVeBKIYRytb5w82tqqmmxJsKFreFD200kvqSOgXj9lbi3RUCd1l/Spo1ZcAwPWQeIZHwx18Bqw+5+RkAAAAAAAAVsw==
+
+BioXMLRenderModule.jar
+TheGPM.org BioXML Renderer Module
+Render a BioXML file using TheGPM.org
+wRuw+udZnO5/I0afQ6Bil6OQX3LNGeqsKTtq9ETkQ4Wzq6FOCiAzr2FzenxOLmPsFQuWseFr4uhUG2e6jkR7si2EMjIAAAAAAAAg/Q==
+
+PeakListConcatModule.jar
+Peak List Concatenator Module
+Concatenate files literally (no conversion).
+PudoIXTN1A0KH9czB4Ovq4rf9HgJgpgMRIEqTQoO5PMoikKKJ2tKvQ0gMFkCYEVLnaVcNqN1FgXipEDjisHV729HNV4AAAAAAACmRg==
+
+PeakListConvertModule.jar
+Peak List Converter Module
+Convert peak lists to specific format.
+W50ms29E4+ghf2up0yL2ipWtA4DiQgeFGZQt2PYEHIhkZMdiq4aahMj7D0BJqfxhUcZb2WlrIJQIlSf9vHi6nFQWy0UAAAAAAACXJg==
+
+PeakListMergeModule.jar
+Peak List Merger Module
+Merge peak lists together to a specific format (using IO Framework).
+gVj70oZ9BJfKa4t3XTHDJNuFsoD6mL98n/KJMshG/Yuth6A0sY4K/LcHVQq1bblVTBIrgB6gwb3V7SqrZ6dTdJbv/YMAAAAAAACP1A==
+
+SQTGeneratorModule.jar
+SQT File Generator
+Generate a SQT file from Sequest output files.
+LUIFVHp9y6nlIXK+tCAQlR1Eg02lX9VXIgzrUXH+NkbKr1a3C0Kqd9Yi93ax1NeJgiZ3whpQL5ssWzurcwabKqcduWoAAAAAAADpOA==
+
+XARSummaryModule.jar
+XAR Summary Module
+View summary of a selected XAR file.
+A+JxAm3Quth2BsK1IO50vuwO3vFwRjxm4urbUfb33MynDL2fK2Wqb97APUWbKKtV1F/XA/4vWlX0volinAjOMMXtpxwAAAAAAABa8Q==
+
+Tranche-Modules-FASTA.jar
+FASTA Module
+Concatenate a set of FASTA files. Optionally reverse the protein sequences and convert the FASTA format.
+grcqeudNSQQfg3fL9z2/XECYa70u4MAYsAmryzEzDmFItlMb1+dFOgVPQiFkekPgKDh1saqj0KdC51zk94tEKWgg4gQAAAAAAAFivA==
+
+SameSpotsVisualizationModule.jar
+Nonlinear SameSpots Module
+Launches the SameSpots visualizer and analyzer for 2D images.
+L6K1M2NzNCUL2KOEdZB37ZNv7xrZhjPQciyxfQMUuR9wIPgD8Yukc9xQ5HYOv46ZSFY9VyuOs25DGvMu51JNYyxGPpsAAAAAAAA4CQ==

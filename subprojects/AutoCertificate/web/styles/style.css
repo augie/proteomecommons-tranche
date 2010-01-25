@@ -1,0 +1,262 @@
+/*
+ * Styles only used by the todo subsystem.
+ */
+
+html, body {
+  color: #111;
+  font-size: 12pt;
+}
+
+hr {
+  height: 1px;
+  border: 0;
+  background: #333;
+}
+
+/*** GENERICS ***/
+.display_none{
+  display: none;
+}
+.title, .username {
+  font-weight: bold;
+}
+.status {
+  font-weight: bold;
+}
+.thin_column {
+  width: 1em;
+}
+.thin_column input, td input {
+  display: inline;
+  margin: 0;
+}
+
+/* User component for admin form to add users */
+.user {
+  border: 1px solid #ccc;
+  background: #eee;
+  font-size: .9em;
+  padding: .5em;
+  margin: .5em;
+}
+.user p, .user input {
+  margin: .5em;
+} 
+
+/* Prints a message passed signifying some event */
+#flash {
+  background: #f5f5f5;
+  color: #808000;
+  border-top: 1px solid #600;
+  border-bottom: 1px solid #600;
+  padding: .3em;
+  font-weight: bold;
+  letter-spacing: .1em;
+  font-family: arial, helvetica, sans-serif;
+  font-size: .85em;
+  font-variant: small-caps;
+}
+
+/* Some hidden fields were getting styled in Firefox. Don't. */
+input#flash {
+  display: none;
+}
+
+a#add-user:link, a#add-user:visited {
+  display: block;
+  border: 1px solid black;
+  padding: .2em;
+  background: #eee;
+  font-weight: bold;
+  text-decoration: none;
+  text-transform: lowercase;
+  font-variant: small-caps;
+  width: 7em;
+}
+
+a#add-user:hover {
+  border: 1px solid #600;
+  color: #600;
+}
+
+/* For styling exception messages and stack traces */
+#exception {
+  color: #000;
+  font-size: .8em;
+  font-family: courier, courier new, monospace;
+  background: #eee;
+  padding: .5em;
+}
+
+/* Box for every dynamic todo */
+.todo {
+  border: 1px solid black;
+  padding: .5em;
+  background: #BDB76B;
+  margin-bottom: 1em;
+}
+
+.todo a:link, .todo a:visited {
+  font-size: .9em;
+  color: #600;
+}
+.todo a:hover {
+  color: #000;
+}
+
+/*** FORMS ***/
+label {
+  display: block;
+  color: #333;
+  font-weight: bold;
+  font-variant: small-caps;
+  font-size: .9em;
+  letter-spacing: .1em;
+}
+
+input, textarea, select {
+  display: block;
+  margin-top: .2em;
+  margin-bottom: 1.2em;
+  border: 1px solid #333;
+}
+
+/* Wish I could target submit buttons w/o classing them... */
+input.submit {
+  margin-top: 2em;
+  margin-bottom: .7em;
+}
+
+p.submit {
+  margin-top: .7em;
+  font-family: arial, helvetica, sans-serif;
+  font-size: .8em;
+}
+
+/* Abs minimum margin around form */
+form {
+  margin-top: 1.2em;
+  margin-bottom: 1.2em;
+}
+
+/* This will affect all inputs, including checkboxes and submits! */
+input {
+}
+
+.submit {
+  margin-top: 2.5em;
+}
+
+textarea {
+  height: 7em;
+  width: 100%;
+}
+
+div.todo p, div.todo textarea {
+  margin: 0;
+  margin-bottom: .5em;
+}
+
+/*** ANCHORS ***/
+
+a:link strong, a:visited strong {
+  font-variant: small-caps;
+  font-size: .9em;
+}
+
+a#logout:link, a#logout:visited {
+  display: block;
+  height: 1.2em;
+  text-align: right;
+  text-decoration: none;
+  border: 0;
+  border-bottom: 1px solid #600;
+  color: #333;
+  font-variant: small-caps;
+  font-weight: normal;
+  margin-top: -1.4em;
+}
+
+a#logout, h2 {
+  width: 90%;
+  padding-right: .5em;
+}
+
+a#logout:hover {
+  color: #600;
+}
+
+a:link, a:visited {
+  color: #333;
+}
+
+a:hover {
+  color: #600;
+}
+
+/*** HEADERS ***/
+
+h1 {
+  color: #600;
+  font-family: arial, helvetica, sans-serif;
+  margin-bottom: 0;
+}
+
+h2 {
+  color: #333;
+  font-family: arial, helvetica, sans-serif;
+  font-size: 1em;
+  letter-spacing: .2em;
+  margin-top: 2em;
+  border-bottom: 1px dashed #333;
+  /* Padding w/ anchors to reached conformity w/ logout link */
+}
+
+h3 {
+  font-size: .85em;
+  color: #808000;
+  font-family: arial, helvetica, sans-serif;
+  letter-spacing: .1em;
+  margin-top: 1em;
+  margin-bottom: .5em;
+}
+
+/*** LISTS ***/
+ul, li {
+  margin: 0;
+  padding: 0;
+}
+
+ul {
+  margin: 1.5em;
+}
+
+/*** TABLES ***/
+table, td, th {
+  text-align: left;
+  border-collapse: collapse;
+  border: 1px solid black;
+}
+
+table{
+  width: 100%;
+  margin-bottom: 1.5em;
+  font-size: .85em;
+}
+
+td, th {
+  padding: .2em;
+}
+
+th {
+  background: #808000;
+  color: #fff;
+  font-family: arial, helvetica, sans-serif;
+  font-size: .85em;
+  font-variant: small-caps;
+}
+
+/* Special rules */
+div#new_group_box {
+  display: none;
+}
