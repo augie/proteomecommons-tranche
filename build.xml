@@ -18,29 +18,29 @@
     <property name="dist.lib" location="${dist}/${name.lib}"/>
     <property name="name.jar" value="pc-tranche.jar"/>
     <property name="dist.jar" location="${dist}/${name.jar}"/>
-	<property name="dist.zip" location="${dist}/pc-tranche-build${buildNumber}.zip"/>
+	<property name="dist.zip" location="${dist}/pc-tranche-b${buildNumber}.zip"/>
     
     <!-- set the variables needed for the linux server build -->
     <property name="dir.server.linux" location="build/server-linux"/>
     <property name="build.server.linux" location="${build}/server-linux"/>
-    <property name="dist.server.linux.zip" location="${dist}/pc-tranche-server-linux-build${buildNumber}.zip"/>
+    <property name="dist.server.linux.zip" location="${dist}/pc-tranche-server-linux-b${buildNumber}.zip"/>
 
     <!-- set the variables needed for the windows server build -->
     <property name="dir.server.windows" location="build/server-windows"/>
     <property name="build.server.windows" location="${build}/server-windows"/>
-    <property name="dist.server.windows.zip" location="${dist}/pc-tranche-server-windows-build${buildNumber}.zip"/>
+    <property name="dist.server.windows.zip" location="${dist}/pc-tranche-server-windows-b${buildNumber}.zip"/>
 
     <!-- set the variables needed for the GetFileTool JAR build -->
     <property name="dir.get" location="build/get"/>
     <property name="build.get" location="${build}/get"/>
     <property name="build.get.jar" location="${build.get}/pc-tranche-get.jar"/>
-    <property name="dist.get.zip" location="${dist}/pc-tranche-get-build${buildNumber}.zip"/>
+    <property name="dist.get.zip" location="${dist}/pc-tranche-get-b${buildNumber}.zip"/>
 
     <!-- set the variables needed for the AddFileTool JAR build -->
     <property name="dir.add" location="build/add"/>
     <property name="build.add" location="${build}/add"/>
     <property name="build.add.jar" location="${build.add}/pc-tranche-add.jar"/>
-    <property name="dist.add.zip" location="${dist}/pc-tranche-add-build${buildNumber}.zip"/>
+    <property name="dist.add.zip" location="${dist}/pc-tranche-add-b${buildNumber}.zip"/>
     
     <!-- path required for runtime compiling-->
     <path id="path.rt.compile">
