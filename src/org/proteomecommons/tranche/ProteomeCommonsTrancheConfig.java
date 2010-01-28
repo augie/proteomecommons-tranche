@@ -16,7 +16,11 @@
 package org.proteomecommons.tranche;
 
 import java.util.ArrayList;
+import org.tranche.ConfigureTranche;
 import org.tranche.gui.ConfigureTrancheGUI;
+import org.tranche.security.SecurityUtil;
+import org.tranche.time.TimeUtil;
+import org.tranche.util.DebugUtil;
 
 /**
  * <p>Used to explicitly load the configuration file for the ProteomeCommons.org Tranche Network in Apache Tomcat.</p>
@@ -25,7 +29,7 @@ import org.tranche.gui.ConfigureTrancheGUI;
  */
 public class ProteomeCommonsTrancheConfig {
 
-    public static final String CONFIG_FILE_LOCATION = "/org/proteomecommons/tranche/tranche.conf";
+    public static final String CONFIG_FILE_LOCATION = "/org/proteomecommons/tranche/pc-tranche.conf";
     private static boolean loaded = false;
 
     /**
