@@ -5,9 +5,11 @@
 
 package org.proteomecommons.tranche.scripts.test;
 
+import org.proteomecommons.tranche.ProteomeCommonsTrancheConfig;
 import org.tranche.TrancheServer;
 import org.tranche.hash.BigHash;
 import org.tranche.network.ConnectionUtil;
+import org.tranche.network.NetworkUtil;
 import org.tranche.util.IOUtil;
 
 /**
@@ -17,21 +19,28 @@ import org.tranche.util.IOUtil;
 public class CheckShadowServerForChunksScript {
     
     final static Chunk[] chunksToCheck = {
-        // Top-Down Aflavus: PfBBXOHKrcjh9hm6pygUhqOIXvohLKq4dS8A/c5U3Qaj5HfAhG+M9YjN3hZVIJuNmKlwfkFgXKsV4sNEYvJjQ8cLP+4AAAAAAAAD+Q==
-        new Chunk(BigHash.createHashFromString("GBqD04Rv2+DKb8WfdfE2pLrxyzXr2Eg4XWq7tkpNj/eH50WCmcXKsfLCqJADLHu/ObzmJSnZpjaoZ1r67+nkNJyRBHIAAAAAF1qw/A=="), false),
-        new Chunk(BigHash.createHashFromString("gVoVNL9Sd8DvXHKYpws4Z15uEhdm57yBGZ5dKlxNU+HKGKY7poyl0V3CHg6t2xevV3lzs1shDNXaanmq/JpFEFCI6KsAAAAAGWOpog=="), false),
-        new Chunk(BigHash.createHashFromString("UOda7wlCvo9vWdOkzJvEnAQ9aH1LQKZJqFoEktnO4QwN7GE7bLGRGx+Sogcios5f6MPFk3xyQ3MjUgIunKfOezEqdOYAAAAASKEvpw=="), false),
-        // MaxQuant: 2BmnbGCLnSj1iuz4G/uGB444cZqh5ThNyVzLEWi1BKoini2JpJidQOiDkHNFQQ0EmBRO6N1xfyRbcOmYx6esdIx703UAAAAAAAA4/Q==
-        new Chunk(BigHash.createHashFromString("vTm7hh9GJe1P5EPSn6Mp66R0fcM0t7bBcMdlDPdQpWXfTBv0dPrDDzMxbafNMZMyuPw7rrS+pogTLhNEHDTVEvEyrhYAAAAADsPvbg=="), false),
-        new Chunk(BigHash.createHashFromString("58jWZl/QmrxWNt5COtwo2rEiVBC40Zqfh2SDGLL+HaRj2b8CuiOyxmVdQPorRRcevPps7z57XmvXiV0sbFhfkLnAEgwAAAAAEBjFxw=="), false),
-        new Chunk(BigHash.createHashFromString("rb2qUS98qV3yZujfoNLaxyXNYDVong5+NfJSu/2r1xUN80fwLsQwMKNIo7LmYOUb1eHD5Xc9aidHwQ3mJxoT/2tvwVUAAAAADfb7Bw=="), false),
-        new Chunk(BigHash.createHashFromString("1bu8pNohm7WtRZh3ZUX6vXitgHmvt2etidYg+LfmJDV/18DBI/jpleJsyrTXKwSFpmXbVAE10iPjK7NAlzO4S1gplZwAAAAADxZ0nQ=="), false),
-        new Chunk(BigHash.createHashFromString("7w0dKjAD3iMj+HtWrket90IbAjyg3mATu/qhzucRAjs6B0SthI4ddzpri6ipWKurvdNljtFRPoa0vJUtsRH+fFzCR1UAAAAADl/rKw=="), false),
-        new Chunk(BigHash.createHashFromString("mQ9Wrg5HEYDjyQW5Hgvgp95u/1CrIu8pOOigiTBOfz1sJL7qdcObxH2m7i3bg3z0wTx3vNhYobwcUDU+kbbHy6nAGFEAAAAAFkIYNg=="), false),
+//        // Top-Down Aflavus: PfBBXOHKrcjh9hm6pygUhqOIXvohLKq4dS8A/c5U3Qaj5HfAhG+M9YjN3hZVIJuNmKlwfkFgXKsV4sNEYvJjQ8cLP+4AAAAAAAAD+Q==
+//        new Chunk(BigHash.createHashFromString("GBqD04Rv2+DKb8WfdfE2pLrxyzXr2Eg4XWq7tkpNj/eH50WCmcXKsfLCqJADLHu/ObzmJSnZpjaoZ1r67+nkNJyRBHIAAAAAF1qw/A=="), false),
+//        new Chunk(BigHash.createHashFromString("gVoVNL9Sd8DvXHKYpws4Z15uEhdm57yBGZ5dKlxNU+HKGKY7poyl0V3CHg6t2xevV3lzs1shDNXaanmq/JpFEFCI6KsAAAAAGWOpog=="), false),
+//        new Chunk(BigHash.createHashFromString("UOda7wlCvo9vWdOkzJvEnAQ9aH1LQKZJqFoEktnO4QwN7GE7bLGRGx+Sogcios5f6MPFk3xyQ3MjUgIunKfOezEqdOYAAAAASKEvpw=="), false),
+//        // MaxQuant: 2BmnbGCLnSj1iuz4G/uGB444cZqh5ThNyVzLEWi1BKoini2JpJidQOiDkHNFQQ0EmBRO6N1xfyRbcOmYx6esdIx703UAAAAAAAA4/Q==
+//        new Chunk(BigHash.createHashFromString("vTm7hh9GJe1P5EPSn6Mp66R0fcM0t7bBcMdlDPdQpWXfTBv0dPrDDzMxbafNMZMyuPw7rrS+pogTLhNEHDTVEvEyrhYAAAAADsPvbg=="), false),
+//        new Chunk(BigHash.createHashFromString("58jWZl/QmrxWNt5COtwo2rEiVBC40Zqfh2SDGLL+HaRj2b8CuiOyxmVdQPorRRcevPps7z57XmvXiV0sbFhfkLnAEgwAAAAAEBjFxw=="), false),
+//        new Chunk(BigHash.createHashFromString("rb2qUS98qV3yZujfoNLaxyXNYDVong5+NfJSu/2r1xUN80fwLsQwMKNIo7LmYOUb1eHD5Xc9aidHwQ3mJxoT/2tvwVUAAAAADfb7Bw=="), false),
+//        new Chunk(BigHash.createHashFromString("1bu8pNohm7WtRZh3ZUX6vXitgHmvt2etidYg+LfmJDV/18DBI/jpleJsyrTXKwSFpmXbVAE10iPjK7NAlzO4S1gplZwAAAAADxZ0nQ=="), false),
+//        new Chunk(BigHash.createHashFromString("7w0dKjAD3iMj+HtWrket90IbAjyg3mATu/qhzucRAjs6B0SthI4ddzpri6ipWKurvdNljtFRPoa0vJUtsRH+fFzCR1UAAAAADl/rKw=="), false),
+//        new Chunk(BigHash.createHashFromString("mQ9Wrg5HEYDjyQW5Hgvgp95u/1CrIu8pOOigiTBOfz1sJL7qdcObxH2m7i3bg3z0wTx3vNhYobwcUDU+kbbHy6nAGFEAAAAAFkIYNg=="), false),
+        // CPTACT: Study 3: awK+SLwnGYqiJODu5nIO0xA1RzRRRI8K6buVjR8ZuamY344hLSjojGlM+kf/fAUSVOzJBiSt/kwJjJY4MORM0MpeEL8AAAAAAAACjg==
+        new Chunk(BigHash.createHashFromString("aT/yB449bYkD4beoxeiXLMVxMyale8sD8JSjHjTLmYYXbMc9rn1QI+cxBkL717DCr6ZGjUIqBPBy7XFm3FqpbEgRR+8AAAAAABAAAA=="), false),
+        new Chunk(BigHash.createHashFromString("IHarHnUZsPZXENT7oDBMHwPyE/D7Ymhi0HkCemURCJUFGq9AYKWaHHFt5FPBXQX3TSRhOV1EAxmDwap2kbjrms7poeYAAAAAABAAAA=="), false),
+        new Chunk(BigHash.createHashFromString("1e8xZESKJIMdjn/f3p511UdPifMXjCEBCdOM1RWTkT87Jp1R6kTCcGmHI6TvUZ8oWrVSgTbCCBPLWCRrO7xx5TpmuMIAAAAAABAAAA=="), false),
     };
     
     public static void main(String[] args) throws Exception {
         final String shadowURL = "tranche://141.214.65.205:1045";
+        
+        ProteomeCommonsTrancheConfig.load();
+        NetworkUtil.waitForStartup();
         
         try {
             TrancheServer ts = ConnectionUtil.connectURL(shadowURL, true);

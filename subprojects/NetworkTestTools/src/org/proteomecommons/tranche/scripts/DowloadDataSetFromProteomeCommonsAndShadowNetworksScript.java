@@ -26,8 +26,8 @@ public class DowloadDataSetFromProteomeCommonsAndShadowNetworksScript {
      */
     public static void main(String[] args) {
 
-        if (args.length != 2) {
-            System.err.println("Wrong number of arguments. Expected 2, but found: "+args.length);
+        if (args.length != 2 && args.length != 3) {
+            System.err.println("Wrong number of arguments. Expected 2 (or 3 if passphrase), but found: "+args.length);
             printUsage(System.err);
             System.exit(1);
         }
@@ -53,6 +53,12 @@ public class DowloadDataSetFromProteomeCommonsAndShadowNetworksScript {
                 System.exit(1);
             }
             
+            String passphrase = null;
+            
+            if (args.length == 3) {
+                passphrase = args[2];
+            }
+            
             ProteomeCommonsTrancheConfig.load();
             NetworkUtil.waitForStartup();
 
@@ -60,6 +66,17 @@ public class DowloadDataSetFromProteomeCommonsAndShadowNetworksScript {
             
             GetFileTool gft = new GetFileTool();
             gft.setHash(hash);
+            if (passphrase != null) {
+                StringBuffer passphraseHidden = new StringBuffer();
+                for (int i=0; i<passphrase.length(); i++) {
+                    passphraseHidden.append("*");
+                }
+                
+                System.out.println("Using passphrase: "+passphraseHidden);
+                gft.setPassphrase(passphrase);
+            }
+            
+            // DEBUG> Put this back!
             gft.addExternalServerURLToUse(shadowURL);
             CommandLineGetFileToolListener clc = new CommandLineGetFileToolListener(gft, System.out);
             gft.addListener(clc);
@@ -91,7 +108,7 @@ public class DowloadDataSetFromProteomeCommonsAndShadowNetworksScript {
     private static void printUsage(PrintStream out) {
         out.println();
         out.println("USAGE");
-        out.println("   DowloadDataSetFromProteomeCommonsAndShadowNetworksScript <hash> </path/to/download/dir>");
+        out.println("   DowloadDataSetFromProteomeCommonsAndShadowNetworksScript <hash> </path/to/download/dir> [<passphrase>]");
         out.println();
         out.println("DESCRIPTION");
         out.println("   Download a data set from ProteomeCommons.org-Tranche and its shadow network.");
