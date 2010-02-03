@@ -29,6 +29,9 @@ import org.tranche.network.StatusTableRow;
 import org.tranche.project.ProjectFile;
 import org.tranche.project.ProjectFilePart;
 import org.tranche.remote.RemoteTrancheServer;
+import org.tranche.server.PropagationReturnWrapper;
+import org.tranche.users.UserZipFile;
+import org.tranche.users.UserZipFileUtil;
 import org.tranche.util.EmailUtil;
 import org.tranche.util.IOUtil;
 import org.tranche.util.TempFileUtil;
@@ -44,6 +47,10 @@ public class ReplicationCountScript {
     public static String post = null;
     public static boolean checkPC = false;
     public static boolean randomize = true;
+    public static boolean replicate = false;
+    public static int replicationsRequired = 3;
+    public static String pc_user = null;
+    public static String pc_user_pass = null;
     public static String user = null;
     public static String pass = null;
     public static final ArrayList<File> tsvFiles = new ArrayList<File>();
@@ -58,30 +65,56 @@ public class ReplicationCountScript {
 
         ProteomeCommonsTrancheConfig.load();
 
-        if (args.length == 1 && (args[0].trim().equals("-usage") || args[0].trim().equals("help") || args[0].trim().equals("-help"))) {
+        if (args.length == 1 && (args[0].trim().equals("--usage") || args[0].trim().equals("help") || args[0].trim().equals("--help"))) {
             System.out.println("This script takes inventory of data and meta data replications.");
             System.out.println("Items in brackets are optional. Usage:");
             System.out.println("");
-            System.out.println("[-post url] [-pc.org true/false] [-tagsuser pc.org_tags_db_user] [-tagspass pc.org_tags_db_pass] [-tsv file] [-csv file] [-c true/false] [-r true/false] [-threads num_threads]");
-            System.out.println("");
-            System.out.println("  -post url                       Optional. URL to post reports to.");
-            System.out.println("  -pc.org true/false              Optional. Flag whether to check the ProteomeCommons.org Tranche network. Default false.");
-            System.out.println("  -user pc.org_db_user            Optional if \"-pc.org false\" else required. Sets the ProteomeCommons.org Tranche network database user name to use.");
-            System.out.println("  -pass pc.org_db_pass            Optional if \"-pc.org false\" else required. Sets the ProteomeCommons.org Tranche network database user passphrase to use.");
-            System.out.println("  -tsv file                       Optional. More than one can be added. Location of a tab separated value file to use as a list of projects to check. Must be in format: \"hash\\tpassphrase\\n\" for each line.");
-            System.out.println("  -csv file                       Optional. More than one can be added. Location of a comma separated value file to use as a list of projects to check. Must be in the format: \"hash,passphrase\\n\" for each line.");
-            System.out.println("  -c true/false                   Optional. Flag whether to continuously loop. Default false.");
-            System.out.println("  -r true/false                   Optional. Flag whether to randomize the selection of hashes. Default true.");
-            System.out.println("  -h string                       Optional. More than one can be added. If set, will only check hashes that start with string.");
-            System.out.println("  -log log_file                   Optional. Path to the log file to write to. If already exists, will overwrite. Default prints to System.out.");
-            System.out.println("  -hash hash                      Optional. Non-encrypted project hash to check.");
-            System.out.println("  -n email                        Optional. Send an email to the given address when a data set is found to contain chunks with zero replications.");
+            System.out.println("  -c file                      Optional. More than one can be added. Location of a comma separated value file to use as a list of projects to check. Must be in the format: \"hash,passphrase\\n\" for each line.");
+            System.out.println("  -C true/false                Optional. Flag whether to continuously loop. Default false.");
+            System.out.println("  -e true/false                Optional. Whether to replicate chunks with fewer than -E replications. Default false.");
+            System.out.println("  -E integer                   Optional. The number of replications desired. Default 3.");
+            System.out.println("  -h string                    Optional. More than one can be added. If set, will only check hashes that start with string.");
+            System.out.println("  -H hash                      Optional. Non-encrypted project hash to check.");
+            System.out.println("  -l log_file                  Optional. Path to the log file to write to. If already exists, will overwrite. Default prints to System.out.");
+            System.out.println("  -n email                     Optional. Send an email to the given address when a data set is found to contain chunks with zero replications.");
+            System.out.println("  -o url                       Optional. URL to post reports to.");
+            System.out.println("  -p admin_pass                Optional when \"-r false\" else required. Sets the ProteomeCommons.org Tranche repository admin passphrase.");
+            System.out.println("  -P pc_user_pass              Optional when \"-e false\" else required.");
+            System.out.println("  -r true/false                Optional. Flag whether to check the ProteomeCommons.org Tranche repository. Default false.");
+            System.out.println("  -R true/false                Optional. Flag whether to randomize the selection of hashes. Default true.");
+            System.out.println("  -t file                      Optional. More than one can be added. Location of a tab separated value file to use as a list of projects to check. Must be in format: \"hash\\tpassphrase\\n\" for each line.");
+            System.out.println("  -u admin_user                Optional when \"-r false\" else required. Sets the ProteomeCommons.org Tranche repository admin user.");
+            System.out.println("  -U pc_user                   Optional when \"-e false\" else required.");
             return;
         }
 
         // parse the args
         for (int i = 0; i < args.length - 1; i += 2) {
-            if (args[i].trim().equals("-post")) {
+            if (args[i].trim().equals("-e")) {
+                try {
+                    replicate = Boolean.valueOf(args[i + 1]);
+                } catch (Exception e) {
+                    return;
+                }
+            } else if (args[i].trim().equals("-E")) {
+                try {
+                    replicationsRequired = Integer.valueOf(args[i + 1]);
+                } catch (Exception e) {
+                    return;
+                }
+            } else if (args[i].trim().equals("-U")) {
+                try {
+                    pc_user = args[i + 1];
+                } catch (Exception e) {
+                    return;
+                }
+            } else if (args[i].trim().equals("-P")) {
+                try {
+                    pc_user_pass = args[i + 1];
+                } catch (Exception e) {
+                    return;
+                }
+            } else if (args[i].trim().equals("-o")) {
                 try {
                     // test url
                     new File(args[i + 1]).toURL();
@@ -90,28 +123,28 @@ public class ReplicationCountScript {
                     System.out.println("Bad post URL. Exiting.");
                     return;
                 }
-            } else if (args[i].trim().equals("-pc.org")) {
+            } else if (args[i].trim().equals("-r")) {
                 try {
                     checkPC = Boolean.valueOf(args[i + 1]);
                 } catch (Exception e) {
-                    System.out.println("Bad argument given for -pc.org. Allowed \"true\" or \"false\".");
+                    System.out.println("Bad argument given for -r. Allowed \"true\" or \"false\".");
                     return;
                 }
-            } else if (args[i].trim().equals("-user")) {
+            } else if (args[i].trim().equals("-u")) {
                 try {
                     user = args[i + 1];
                 } catch (Exception e) {
-                    System.out.println("Bad argument given for -tagsuser.");
+                    System.out.println("Bad argument given for -u.");
                     return;
                 }
-            } else if (args[i].trim().equals("-pass")) {
+            } else if (args[i].trim().equals("-p")) {
                 try {
                     pass = args[i + 1];
                 } catch (Exception e) {
-                    System.out.println("Bad argument given for -tagspass.");
+                    System.out.println("Bad argument given for -p.");
                     return;
                 }
-            } else if (args[i].trim().equals("-tsv")) {
+            } else if (args[i].trim().equals("-t")) {
                 File file = new File(args[i + 1]);
                 // reality check
                 if (!file.exists()) {
@@ -123,7 +156,7 @@ public class ReplicationCountScript {
                     return;
                 }
                 tsvFiles.add(file);
-            } else if (args[i].trim().equals("-csv")) {
+            } else if (args[i].trim().equals("-c")) {
                 File file = new File(args[i + 1]);
                 // reality check
                 if (!file.exists()) {
@@ -135,18 +168,18 @@ public class ReplicationCountScript {
                     return;
                 }
                 csvFiles.add(file);
-            } else if (args[i].trim().equals("-c")) {
+            } else if (args[i].trim().equals("-C")) {
                 try {
                     continuous = Boolean.valueOf(args[i + 1]);
                 } catch (Exception e) {
-                    System.out.println("Bad argument given for -c. Allowed \"true\" or \"false\".");
+                    System.out.println("Bad argument given for -C. Allowed \"true\" or \"false\".");
                     return;
                 }
-            } else if (args[i].trim().equals("-r")) {
+            } else if (args[i].trim().equals("-R")) {
                 try {
                     randomize = Boolean.valueOf(args[i + 1]);
                 } catch (Exception e) {
-                    System.out.println("Bad argument given for -r. Allowed \"true\" or \"false\".");
+                    System.out.println("Bad argument given for -R. Allowed \"true\" or \"false\".");
                     return;
                 }
             } else if (args[i].trim().equals("-h")) {
@@ -156,7 +189,7 @@ public class ReplicationCountScript {
                     System.out.println("Bad argument given for -h.");
                     return;
                 }
-            } else if (args[i].trim().equals("-log")) {
+            } else if (args[i].trim().equals("-l")) {
                 logFile = new File(args[i + 1]);
                 // reality check
                 if (!logFile.exists()) {
@@ -165,10 +198,9 @@ public class ReplicationCountScript {
                         return;
                     }
                 }
-            } else if (args[i].trim().equals("-hash")) {
+            } else if (args[i].trim().equals("-H")) {
                 try {
-                    BigHash hash = BigHash.createHashFromString(args[i + 1]);
-                    hashesToCheck.add(hash);
+                    hashesToCheck.add(BigHash.createHashFromString(args[i + 1]));
                 } catch (Exception e) {
                     System.out.println("Bad argument given for -hash.");
                     return;
@@ -564,57 +596,155 @@ public class ReplicationCountScript {
                 }
 
                 // for all the servers
-                for (final String host : ConnectionUtil.getConnectedHosts()) {
-                    TrancheServer ts = null;
-                    for (List<BigHash> metaHashList : metaHashListList) {
-                        try {
-                            ts = ConnectionUtil.getHost(host);
-                            // get back the booleans
-                            boolean[] booleanList = ts.hasMetaData(metaHashList.toArray(new BigHash[0]));
-                            for (int i = 0; i < metaHashList.size(); i++) {
-                                if (booleanList[i]) {
-                                    synchronized (metaHashes) {
-                                        int repCount = metaHashes.get(metaHashList.get(i));
-                                        metaHashes.put(metaHashList.get(i), repCount + 1);
+                for (final List<BigHash> metaHashList : metaHashListList) {
+                    Set<Thread> threads = new HashSet<Thread>();
+                    for (final String host : ConnectionUtil.getConnectedHosts()) {
+                        Thread t = new Thread() {
+
+                            public void run() {
+                                try {
+                                    TrancheServer ts = ConnectionUtil.connectHost(host, true);
+                                    // get back the booleans
+                                    boolean[] booleanList = ts.hasMetaData(metaHashList.toArray(new BigHash[0]));
+                                    for (int i = 0; i < metaHashList.size(); i++) {
+                                        if (booleanList[i]) {
+                                            synchronized (metaHashes) {
+                                                int repCount = metaHashes.get(metaHashList.get(i));
+                                                metaHashes.put(metaHashList.get(i), repCount + 1);
+                                            }
+                                        }
                                     }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                             }
+                        };
+                        t.setDaemon(true);
+                        t.start();
+                        threads.add(t);
+                    }
+                    for (Thread t : threads) {
+                        try {
+                            t.join();
                         } catch (Exception e) {
-                            e.printStackTrace();
                         }
                     }
+                }
+                for (final List<BigHash> dataHashList : dataHashListList) {
+                    Set<Thread> threads = new HashSet<Thread>();
+                    for (final String host : ConnectionUtil.getConnectedHosts()) {
+                        Thread t = new Thread() {
 
-                    for (List<BigHash> dataHashList : dataHashListList) {
-                        try {
-                            ts = ConnectionUtil.getHost(host);
-                            // get back the booleans
-                            boolean[] booleanList = ts.hasData(dataHashList.toArray(new BigHash[0]));
-                            for (int i = 0; i < dataHashList.size(); i++) {
-                                if (booleanList[i]) {
-                                    synchronized (dataHashes) {
-                                        int repCount = dataHashes.get(dataHashList.get(i));
-                                        dataHashes.put(dataHashList.get(i), repCount + 1);
+                            public void run() {
+                                try {
+                                    TrancheServer ts = ConnectionUtil.connectHost(host, true);
+                                    // get back the booleans
+                                    boolean[] booleanList = ts.hasData(dataHashList.toArray(new BigHash[0]));
+                                    for (int i = 0; i < dataHashList.size(); i++) {
+                                        if (booleanList[i]) {
+                                            synchronized (dataHashes) {
+                                                int repCount = dataHashes.get(dataHashList.get(i));
+                                                dataHashes.put(dataHashList.get(i), repCount + 1);
+                                            }
+                                        }
                                     }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                             }
+                        };
+                        t.setDaemon(true);
+                        t.start();
+                        threads.add(t);
+                    }
+                    for (Thread t : threads) {
+                        try {
+                            t.join();
                         } catch (Exception e) {
-                            e.printStackTrace();
                         }
                     }
                 }
 
-                // input the rep coutns
-                for (Integer repCount : metaHashes.values()) {
+                UserZipFile userZipFile = null;
+                if (pc_user != null && pc_user_pass != null) {
+                    try {
+                        userZipFile = UserZipFileUtil.getUserZipFile(pc_user, pc_user_pass);
+                        userZipFile.setPassphrase(pc_user_pass);
+                        if (userZipFile.getCertificate() == null || userZipFile.getPrivateKey() == null) {
+                            userZipFile = null;
+                        } else {
+                            println("Signed in as " + pc_user);
+                        }
+                    } catch (Exception e) {
+                    }
+                }
+
+                // input the rep counts
+                for (BigHash metaDataHash : metaHashes.keySet()) {
+                    int repCount = metaHashes.get(metaDataHash);
                     if (repCount >= 5) {
                         reps[5]++;
                     } else {
+                        if (replicate && repCount < replicationsRequired && repCount > 0 && userZipFile != null) {
+                            byte[] metaDataBytes = null;
+                            ROWS:
+                            for (String host : ConnectionUtil.getConnectedHosts()) {
+                                try {
+                                    TrancheServer ts = ConnectionUtil.connectHost(host, true);
+                                    PropagationReturnWrapper pew = IOUtil.getMetaData(ts, metaDataHash, false);
+                                    if (pew != null && pew.isByteArrayDoubleDimension()) {
+                                        metaDataBytes = ((byte[][]) pew.getReturnValueObject())[0];
+                                        if (metaDataBytes != null) {
+                                            break;
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                }
+                            }
+                            if (metaDataBytes != null) {
+                                for (String host : ConnectionUtil.getConnectedHosts()) {
+                                    try {
+                                        TrancheServer ts = ConnectionUtil.connectHost(host, true);
+                                        IOUtil.setMetaData(ts, userZipFile.getCertificate(), userZipFile.getPrivateKey(), false, metaDataHash, metaDataBytes);
+                                    } catch (Exception e) {
+                                    }
+                                }
+                            }
+                        }
                         reps[repCount]++;
                     }
                 }
-                for (Integer repCount : dataHashes.values()) {
+                for (BigHash dataHash : dataHashes.keySet()) {
+                    int repCount = dataHashes.get(dataHash);
                     if (repCount >= 5) {
                         reps[5]++;
                     } else {
+                        if (replicate && repCount < replicationsRequired && userZipFile != null) {
+                            byte[] dataBytes = null;
+                            ROWS:
+                            for (String host : ConnectionUtil.getConnectedHosts()) {
+                                try {
+                                    TrancheServer ts = ConnectionUtil.connectHost(host, true);
+                                    PropagationReturnWrapper pew = IOUtil.getData(ts, dataHash, false);
+                                    if (pew != null && pew.isByteArrayDoubleDimension()) {
+                                        dataBytes = ((byte[][]) pew.getReturnValueObject())[0];
+                                        if (dataBytes != null) {
+                                            break;
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                }
+                            }
+                            if (dataBytes != null) {
+                                for (String host : ConnectionUtil.getConnectedHosts()) {
+                                    try {
+                                        TrancheServer ts = ConnectionUtil.connectHost(host, true);
+                                        IOUtil.setData(ts, userZipFile.getCertificate(), userZipFile.getPrivateKey(), dataHash, dataBytes);
+                                    } catch (Exception e) {
+                                    }
+                                }
+                            }
+                        }
                         reps[repCount]++;
                     }
                 }
@@ -632,6 +762,7 @@ public class ReplicationCountScript {
                 }
             }
         }
+
     }
 
     /**
@@ -642,7 +773,8 @@ public class ReplicationCountScript {
      * @return
      * @throws java.lang.Exception
      */
-    public static File getListOfAllProjectsFile(String username, String passphrase) throws Exception {
+    public static File getListOfAllProjectsFile(
+            String username, String passphrase) throws Exception {
         InputStream is = null;
         File cacheFile = null;
         FileWriter fw = null;
@@ -661,11 +793,12 @@ public class ReplicationCountScript {
             pairs.add(new NameValuePair("username", username));
 
             NameValuePair[] pairArray = new NameValuePair[pairs.size()];
-            for (int i = 0; i < pairs.size(); i++) {
+            for (int i = 0; i <
+                    pairs.size(); i++) {
                 pairArray[i] = pairs.get(i);
             }
 
-            // set the values
+// set the values
             pm.setRequestBody(pairArray);
 
             // execute the method
@@ -676,22 +809,26 @@ public class ReplicationCountScript {
                 throw new Exception("Did not authenticate or there is a problem with the server. (HTTP response=" + status + ")");
             }
 
-            // For some reason, getting string first helps!
+// For some reason, getting string first helps!
             pm.getResponseBodyAsString();
-            is = pm.getResponseBodyAsStream();
+            is =
+                    pm.getResponseBodyAsStream();
 
             // create a file with the same info
-            cacheFile = TempFileUtil.createTemporaryFile(".cache");
-            fw = new FileWriter(cacheFile);
+            cacheFile =
+                    TempFileUtil.createTemporaryFile(".cache");
+            fw =
+                    new FileWriter(cacheFile);
             try {
                 while (is.available() > 0) {
                     fw.write(is.read());
                 }
+
             } finally {
                 IOUtil.safeClose(fw);
             }
 
-            // read the cache file
+// read the cache file
             return cacheFile;
         } finally {
             IOUtil.safeClose(is);
