@@ -25,7 +25,7 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
     public static void main(String[] args) throws Exception {
         printOnlineServerInfo();
     }
-    
+
     private static void printOnlineServerInfo() throws Exception {
         ProteomeCommonsTrancheConfig.load();
         NetworkUtil.waitForStartup();
@@ -54,7 +54,7 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
 
         table.printTable();
     }
-    
+
     private static TrancheStatusTableRow getServerInformationByHost(final String host) throws Exception {
         final boolean isConnected = ConnectionUtil.isConnected(host);
 
@@ -118,7 +118,7 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                 }
 
                 StatusTable t = ts.getNetworkStatusPortion(GetNetworkStatusItem.RETURN_ALL, GetNetworkStatusItem.RETURN_ALL);
-                int online = 0, total = 0, core = 0, onlineCore = 0;
+                int online = 0, total = 0, core = 0, onlineCore = 0, onlineReadable = 0, onlineWritable = 0, onlineReadableAndWritable = 0;
 
                 for (StatusTableRow r : t.getRows()) {
                     total++;
@@ -131,14 +131,28 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                     if (r.isCore() && r.isOnline()) {
                         onlineCore++;
                     }
+                    if (r.isReadable()) {
+                        onlineReadable++;
+                    }
+                    if (r.isWritable()) {
+                        onlineWritable++;
+                    }
+                    if (r.isReadable() && r.isWritable()) {
+                        onlineReadableAndWritable++;
+                    }
                 }
 
                 System.out.println();
                 System.out.println("Network status table:");
-                System.out.println("    Online:         " + online);
-                System.out.println("    Core:           " + core);
-                System.out.println("    Online & Core:  " + onlineCore);
-                System.out.println("    Total:          " + total);
+                System.out.println("    Online:            " + online);
+                System.out.println("    Core:              " + core);
+                System.out.println("    Online & Core:     " + onlineCore);
+                System.out.println();
+                System.out.println("    Readable:          " + onlineReadable);
+                System.out.println("    Writable:          " + onlineWritable);
+                System.out.println("    Readable/Writable: " + onlineReadableAndWritable);
+                System.out.println();
+                System.out.println("    Total:             " + total);
 
                 TrancheStatusTableRow trow = new TrancheStatusTableRow(host);
                 trow.add(t);
