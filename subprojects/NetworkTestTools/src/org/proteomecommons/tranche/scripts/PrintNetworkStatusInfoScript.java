@@ -8,10 +8,12 @@ import org.proteomecommons.tranche.ProteomeCommonsTrancheConfig;
 import org.proteomecommons.tranche.scripts.status.TrancheStatusTable;
 import org.proteomecommons.tranche.scripts.status.TrancheStatusTableRow;
 import org.tranche.TrancheServer;
+import org.tranche.configuration.ConfigKeys;
 import org.tranche.configuration.Configuration;
 import org.tranche.hash.span.AbstractHashSpan;
 import org.tranche.hash.span.HashSpan;
 import org.tranche.network.*;
+import org.tranche.remote.RemoteTrancheServer;
 import org.tranche.server.GetNetworkStatusItem;
 import org.tranche.security.*;
 import org.tranche.util.*;
@@ -99,6 +101,12 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
             try {
                 Configuration config = IOUtil.getConfiguration(ts, SecurityUtil.getAnonymousCertificate(), SecurityUtil.getAnonymousKey());
 
+                String buildNumber = config.getValue(ConfigKeys.BUILD_NUMBER);
+
+                if (buildNumber != null) {
+                    System.out.println();
+                    System.out.println("Build number: " + buildNumber);
+                }
                 System.out.println();
                 System.out.println("Hash spans for <" + host + ">: " + config.getHashSpans().size());
                 System.out.println();
