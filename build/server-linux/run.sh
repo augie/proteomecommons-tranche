@@ -13,7 +13,7 @@ do
 done
 
 # make the run command fallback on 512m of JVM memory
-RUN="java -Xmx${1-1512}m -Djava.io.tmpdir=./temp -classpath $LIB org.proteomecommons.tranche.LocalDataServer ./"
+RUN="java -Xmx${1-1512}m -Djava.io.tmpdir=./temp -classpath $LIB org.proteomecommons.tranche.LocalDataServer"
 
 # run
 $RUN
