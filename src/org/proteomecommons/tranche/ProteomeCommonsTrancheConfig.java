@@ -15,6 +15,7 @@
  */
 package org.proteomecommons.tranche;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import org.tranche.gui.ConfigureTrancheGUI;
 
@@ -31,7 +32,7 @@ public class ProteomeCommonsTrancheConfig {
     /**
      * <p>Loads the configuration file for the ProteomeCommons.org Tranche repository.</p>
      */
-    public synchronized static void load() {
+    public synchronized static void load() throws IOException {
         // only load once
         if (loaded) {
             return;

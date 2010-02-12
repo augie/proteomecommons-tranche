@@ -30,7 +30,7 @@ public class IdentifyDataChunksThatDoNotVerifyScript implements TrancheScript {
      * 
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         // Stuff
         ProteomeCommonsTrancheConfig.load();
         NetworkUtil.waitForStartup();
