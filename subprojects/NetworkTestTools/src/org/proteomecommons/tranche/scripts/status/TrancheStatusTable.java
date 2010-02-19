@@ -41,11 +41,12 @@ public class TrancheStatusTable {
             }
         }
 
-        final int nameLen = 25;
+        final int nameLen = 30;
+        final int buildLen = 6;
         final int fieldLen = 5;
         String hr = null;
 
-        final String offlineFlag = "X",  notInTable = "-", writableFlag = "w",  readableFlag = "r",  fullHashSpanFlag = "f", fullTargetHashSpanFlag = "t";
+        final String offlineFlag = "X",  notInTable = "-",  writableFlag = "w",  readableFlag = "r",  fullHashSpanFlag = "f",  fullTargetHashSpanFlag = "t";
 
 
         System.out.println("LEGEND:");
@@ -71,6 +72,9 @@ public class TrancheStatusTable {
             for (int i = 0; i < nameLen; i++) {
                 hrBuf.append("-");
             }
+            for (int i = 0; i < buildLen+1; i++) {
+                hrBuf.append("-");
+            }
             for (Integer nextKey : keys.keySet()) {
                 for (int i = 0; i < fieldLen; i++) {
                     hrBuf.append("-");
@@ -86,6 +90,7 @@ public class TrancheStatusTable {
 
         // Print out header
         {
+            // Print out space for name
             StringBuffer nameBuf = new StringBuffer();
             for (int i = 0; i < nameLen; i++) {
                 nameBuf.append(" ");
@@ -93,6 +98,20 @@ public class TrancheStatusTable {
 
             System.out.print(nameBuf);
 
+            // Print out header for build
+            {
+                final String label = "build";
+                final int keyDiff = buildLen - label.length();
+                
+                StringBuffer header = new StringBuffer();
+                header.append(label);
+                for (int i=0; i<keyDiff; i++) {
+                    header.append(" ");
+                }
+                System.out.print("|"+header.toString());
+            }
+            
+            // Print out headers for other servers
             for (Integer nextKey : keyList) {
                 StringBuffer keyBuf = new StringBuffer();
                 keyBuf.append(nextKey);
@@ -126,7 +145,14 @@ public class TrancheStatusTable {
             }
 
             StringBuffer nameBuf = new StringBuffer();
-            nameBuf.append(rowNumber + ". " + row.host);
+
+            String name = row.host;
+
+            if (row.name != null) {
+                name = row.name;
+            }
+
+            nameBuf.append(rowNumber + ". " + name);
 
             int nameDiff = nameLen - nameBuf.length();
             for (int i = 0; i < nameDiff; i++) {
@@ -134,6 +160,20 @@ public class TrancheStatusTable {
             }
 
             System.out.print(nameBuf);
+            
+            // Print out build
+            {
+                final String buildNumber = (row.buildNumber == null ? "" : row.buildNumber);
+                final int diff = buildLen - buildNumber.length();
+                
+                StringBuffer val = new StringBuffer();
+                val.append(buildNumber);
+                for (int i=0; i<diff; i++) {
+                    val.append(" ");
+                }
+                
+                System.out.print("|"+val);
+            }
 
             for (Integer nextKey : keyList) {
 

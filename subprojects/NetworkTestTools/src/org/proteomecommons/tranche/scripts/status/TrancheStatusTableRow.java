@@ -16,10 +16,20 @@ import org.tranche.network.*;
  */
 public class TrancheStatusTableRow implements Comparable {
     private final List<TrancheStatusTableEntry> entries;
-    public final String host;
+    public final String host, name, buildNumber, url;
     
-    public TrancheStatusTableRow(String host) {
+    
+    /**
+     * 
+     * @param host
+     * @param name
+     * @param buildNumber
+     */
+    public TrancheStatusTableRow(String host, String name, String buildNumber, String url) {
         this.host = host;
+        this.name = name;
+        this.buildNumber = buildNumber;
+        this.url = url;
         this.entries = new LinkedList();
     }
     
