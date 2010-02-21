@@ -16,14 +16,14 @@
 package org.proteomecommons.tranche;
 
 /**
- * <p>Starts up a local server with the ProteomeCommons.org Tranche network configuration loaded.</p>
+ * <p>Starts up a local server with the ProteomeCommons.org Tranche repository configuration loaded.</p>
  * @author James "Augie" Hill - augman85@gmail.com
  */
 public class Main {
 
     /**
-     * <p>Runs org.tranche.Main main method with the ProteomeCommons.org Tranche network configuration loaded.</p>
-     * <p>Do not pass in a network configuration file.</p>
+     * <p>Runs org.tranche.Main main method with the ProteomeCommons.org Tranche repository configuration loaded.</p>
+     * <p>Do not pass in a repository configuration file.</p>
      * @param args
      */
     public static void main(String[] args) throws Exception {

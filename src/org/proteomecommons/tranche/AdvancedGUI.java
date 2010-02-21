@@ -16,14 +16,14 @@
 package org.proteomecommons.tranche;
 
 /**
- * <p>Opens up the Tranche GUI with the ProteomeCommons.org Tranche network configuration loaded.</p>
+ * <p>Opens up the Tranche GUI with the ProteomeCommons.org Tranche repository configuration loaded.</p>
  * @author James "Augie" Hill - augman85@gmail.com
  */
 public class AdvancedGUI {
 
     /**
-     * <p>Runs org.tranche.gui.AdvancedGUI main method with the ProteomeCommons.org Tranche network configuration loaded.</p>
-     * <p>Do not pass in a network configuration file.</p>
+     * <p>Runs org.tranche.gui.AdvancedGUI main method with the ProteomeCommons.org Tranche repository configuration loaded.</p>
+     * <p>Do not pass in a repository configuration file.</p>
      * @param args
      */
     public static void main(String[] args) throws Exception {
