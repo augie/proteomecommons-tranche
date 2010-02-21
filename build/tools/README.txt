@@ -24,4 +24,4 @@ PREREQUISITE: Install Java 5 or later version
 
 3. Navigate to the top-most directory in the unzipped file.
 
-4. Run the following command to print usage, replacing <JAR> with the jar file name: java -jar ./<JAR>
+4. Run the following command to print usage, replacing <JAR> with the jar file name: java -jar ./<JAR> --help
