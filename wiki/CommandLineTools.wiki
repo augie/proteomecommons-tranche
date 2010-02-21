@@ -1,2 +1,2 @@
 #labels Featured
-You can download the command line tools from the Downloads section. Read the included *README.txt* file for more information on how to use the tools.
+You can download the command line tools in a ZIP file from the Downloads section. Read the included *README.txt* file for more information on how to use the tools.
