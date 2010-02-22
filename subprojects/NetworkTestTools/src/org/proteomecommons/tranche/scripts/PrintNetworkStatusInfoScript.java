@@ -9,6 +9,7 @@ import java.util.Set;
 import org.proteomecommons.tranche.ProteomeCommonsTrancheConfig;
 import org.proteomecommons.tranche.scripts.status.TrancheStatusTable;
 import org.proteomecommons.tranche.scripts.status.TrancheStatusTableRow;
+import org.proteomecommons.tranche.scripts.utils.ScriptsUtil;
 import org.tranche.TrancheServer;
 import org.tranche.configuration.ConfigKeys;
 import org.tranche.configuration.Configuration;
@@ -26,6 +27,8 @@ import org.tranche.util.*;
 public class PrintNetworkStatusInfoScript implements TrancheScript {
 
     public static final boolean DEFAULT_REGISTER_SERVERS = false;
+    
+    private static final String HR = "------------------------------------------------------------------------------------------------------------------------------------------------------";
 
     /**
      * 
@@ -48,17 +51,17 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
      * @throws java.lang.Exception
      */
     private static void printOnlineServerInfo(String[] args) throws Exception {
-        
+
         boolean isRegister = DEFAULT_REGISTER_SERVERS;
 
-        for (int i = 0; i < args.length; i+=2) {
+        for (int i = 0; i < args.length; i += 2) {
             try {
                 String name = args[i];
                 String value = args[i + 1];
 
                 if (name.equals("-r") || name.equals("--register")) {
                     isRegister = Boolean.parseBoolean(value);
-                    System.out.println("    Parameter: setting register to "+isRegister);
+                    System.out.println("    Parameter: setting register to " + isRegister);
                 } else {
                     System.err.println("Unrecognized parameter: " + name);
                     System.exit(3);
@@ -69,9 +72,11 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                 System.exit(2);
             }
         }
-        
+
         ProteomeCommonsTrancheConfig.load();
         NetworkUtil.waitForStartup();
+
+        Set<String> offlineHosts = new HashSet();
 
         System.out.println("Row count: " + NetworkUtil.getStatus().getRows());
 
@@ -81,6 +86,10 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
         for (StatusTableRow row : NetworkUtil.getStatus().getRows()) {
 
             TrancheStatusTableRow statusRow = getServerInformationByHost(row.getHost());
+
+            if (statusRow == null && row != null) {
+                offlineHosts.add(row.getHost());
+            }
 
             if (statusRow != null && row.isCore() && row.isOnline()) {
                 table.add(statusRow);
@@ -92,14 +101,26 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
         System.out.println("***********************************************************************************");
         System.out.println(" SUMMARY");
         System.out.println("***********************************************************************************");
+        System.out.println();
+        System.out.println(HR);
+        System.out.println("Total offline servers: " + offlineHosts.size());
+        System.out.println(HR);
+        for (String host : offlineHosts) {
+            System.out.println("    * " + ScriptsUtil.getServerNameAndHostName(host));
+        }
+        System.out.println();
+        System.out.println(HR);
         System.out.println("Total online servers: " + count);
+        System.out.println(HR);
         System.out.println();
 
         table.printTable();
 
         if (isRegister) {
             System.out.println();
+            System.out.println(HR);
             System.out.println("Registering servers...");
+            System.out.println(HR);
             Set<String> onlineUrls = new HashSet();
             for (TrancheStatusTableRow row : table.getRows()) {
                 onlineUrls.add(row.url);
@@ -199,9 +220,9 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
             }
 
             System.out.println();
-            System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.println(HR);
             System.out.println(host);
-            System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.println(HR);
 
             try {
                 Configuration config = IOUtil.getConfiguration(ts, SecurityUtil.getAnonymousCertificate(), SecurityUtil.getAnonymousKey());
@@ -288,4 +309,6 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
             }
         }
     }
+
+    
 }

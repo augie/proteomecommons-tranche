@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.proteomecommons.tranche.scripts.utils.ScriptsUtil;
 
 /**
  *
@@ -41,7 +42,7 @@ public class TrancheStatusTable {
             }
         }
 
-        final int nameLen = 30;
+        final int nameLen = 40;
         final int buildLen = 6;
         final int fieldLen = 5;
         String hr = null;
@@ -61,7 +62,7 @@ public class TrancheStatusTable {
         List<Integer> keyList = new LinkedList<Integer>(keys.keySet());
         Collections.sort(keyList);
         for (Integer key : keyList) {
-            System.out.println("    " + key + ": " + keys.get(key));
+            System.out.println("    " + key + ": " + ScriptsUtil.getServerNameAndHostName(keys.get(key)));
         }
 
         System.out.println();
@@ -146,11 +147,7 @@ public class TrancheStatusTable {
 
             StringBuffer nameBuf = new StringBuffer();
 
-            String name = row.host;
-
-            if (row.name != null) {
-                name = row.name;
-            }
+            final String name = ScriptsUtil.getServerNameAndHostName(row.host, row.name);
 
             nameBuf.append(rowNumber + ". " + name);
 
