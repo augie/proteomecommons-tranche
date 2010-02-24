@@ -1,12 +1,14 @@
 #labels Featured
 [http://code.google.com/p/tranche/wiki/FAQ Also See the Tranche FAQ]
 
-===How long will my data be hosted on Tranche?===
-The intention of Tranche is to host data indefinitely. Currently the project is funded by the Phil Andrews Lab at The University of Michigan and through various other collaborators with different grant and funding sources and will continue to operate for the foreseeable future.
+===For how long will my data be hosted?===
+The intention is to host data indefinitely. Currently the project is funded by the Phil Andrews Lab at The University of Michigan and through various other collaborators with different grant and funding sources and will continue to operate for the foreseeable future.
 
 
-===What kinds of files and information can I upload?===
-Any type of file can be uploaded to Tranche. Tranche can be thought of as something like a very large safety deposit box, in that it doesn't matter what you have as long as Tranche has the space for it — and this should not be a problem for the foreseeable future — you can upload it.
+===What kinds of data can I upload?===
+Any type of file can be uploaded. There are several instances where data may be removed:
+  * You did not have the legal right to upload the data.
+  * The data is not relevant to proteomics.
 
 
 ===How do I structure my files for upload?===
