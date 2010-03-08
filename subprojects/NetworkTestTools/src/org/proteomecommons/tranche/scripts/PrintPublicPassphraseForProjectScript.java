@@ -13,7 +13,7 @@ import org.tranche.network.NetworkUtil;
 
 /**
  *
- * @author Tranche
+ * @author Bryan Smith - bryanesmith@gmail.com
  */
 public class PrintPublicPassphraseForProjectScript implements TrancheScript {
 
@@ -50,7 +50,7 @@ public class PrintPublicPassphraseForProjectScript implements TrancheScript {
                 System.out.println("    * No public passphrase.");
             }
 
-            System.out.println("*   File encodings for meta data:");
+            System.out.println("    * File encodings for meta data:");
             for (FileEncoding fe : md.getEncodings()) {
                 System.out.println("        - " + fe.getName() + ": " + fe.getHash());
             }
