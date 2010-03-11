@@ -15,18 +15,15 @@
  */
 package org.proteomecommons.tranche.collaboration;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.io.File;
 import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
-import org.tranche.gui.AddFileToolWizard;
 import org.tranche.gui.ImagePanel;
 import org.tranche.gui.LazyLoadAllSlowStuffAfterGUIRenders;
 import org.tranche.gui.Styles;
-import org.tranche.gui.pools.ServerPool;
-import org.tranche.license.License;
+import org.tranche.gui.add.wizard.AddFileToolWizard;
+import org.tranche.gui.util.GUIUtil;
 
 /**
  *
@@ -41,48 +38,20 @@ public class Wizard {
         return aftw;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         // set the parameters as given by the user
-        boolean config = false, laf = false, usage = false, structure = false, servers = false, tags = false;
         for (int i = 0; i < args.length - 1; i += 2) {
             // look and feel file location
             if (args[i].equals("--config")) {
                 ParametersUtil.setMasterConfig(args[i + 1]);
-                config = true;
             } else if (args[i].equals("--laf")) {
-                ParametersUtil.setLookAndFeelLocation(args[i + 1]);
-                laf = true;
+                ParametersUtil.loadParameters(args[i + 1]);
             } else if (args[i].equals("--usage")) {
-                ParametersUtil.setUsageLocation(args[i + 1]);
-                usage = true;
+                ParametersUtil.loadParameters(args[i + 1]);
             } else if (args[i].equals("--structure")) {
-                ParametersUtil.setUploadStructureLocation(args[i + 1]);
-                structure = true;
-            } else if (args[i].equals("--servers")) {
-                ParametersUtil.setServersLocation(args[i + 1]);
-                servers = true;
+                ParametersUtil.setUploadStructureConfig(args[i + 1]);
             } else if (args[i].equals("--tags")) {
-                ParametersUtil.setTagsLocation(args[i + 1]);
-                tags = true;
-            }
-        }
-
-        // try to load the configuration files locally
-        if (!config) {
-            if (!laf) {
-                ParametersUtil.setLookAndFeelLocation(ParametersUtil.lookAndFeelFileLocation);
-            }
-            if (!usage) {
-                ParametersUtil.setUsageLocation(ParametersUtil.usageFileLocation);
-            }
-            if (!structure) {
-                ParametersUtil.setUploadStructureLocation(ParametersUtil.uploadStructureFileLocation);
-            }
-            if (!servers) {
-                ParametersUtil.setServersLocation(ParametersUtil.serversFileLocation);
-            }
-            if (!tags) {
-                ParametersUtil.setTagsLocation(ParametersUtil.tagsFileLocation);
+                ParametersUtil.setTagsConfig(args[i + 1]);
             }
         }
 
@@ -149,18 +118,7 @@ public class Wizard {
         // try-catch around all setting of parameters in case somebody messed up
         try {
             // servers
-            try {
-                if (ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_USE_CORE_SERVERS)) {
-                    // start the wizard with the core servers
-                    aftw = new AddFileToolWizard();
-                } else {
-                    // load without any servers
-                    aftw = new AddFileToolWizard(null);
-                }
-            } catch (Exception e) {
-                // start the wizard with the core servers
-                aftw = new AddFileToolWizard();
-            }
+            aftw = new AddFileToolWizard();
 
             // try to get the logo for the wizard
             try {
@@ -178,63 +136,32 @@ public class Wizard {
 
             // whether to show the home button
             try {
-                aftw.menuBar.homeButton.setVisible(ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_SHOW_HOME_BUTTON));
+                aftw.getAddFileToolWizardMenuBar().homeButton.setVisible(ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_SHOW_HOME_BUTTON));
             } catch (Exception e) {
             }
 
             // make visible the appropriate options
             try {
-                aftw.setShowServers(ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_SHOW_SERVERS));
+                aftw.getAddFileToolWizardMenuBar().serversMenuItem.setVisible(ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_SHOW_SERVERS));
             } catch (Exception e) {
             }
             try {
-                aftw.setShowTags(ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_SHOW_TAGS));
+                aftw.getAddFileToolWizardMenuBar().annotationsMenuItem.setVisible(ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_SHOW_TAGS));
             } catch (Exception e) {
             }
-            try {
-                aftw.setShowRegister(ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_SHOW_REGISTER));
-            } catch (Exception e) {
-            }
-            try {
-                aftw.setShowSkipChunks(ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_SHOW_SKIP_CHUNKS));
-            } catch (Exception e) {
-            }
-            try {
-                aftw.setShowRemoteRep(ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_SHOW_REMOTE_REP));
-            } catch (Exception e) {
-            }
-
-            // set the size
-            try {
-                aftw.setPreferredSize(new Dimension(Integer.valueOf(ParametersUtil.getParameter(ParametersUtil.PARAM_WIDTH)), Integer.valueOf(ParametersUtil.getParameter(ParametersUtil.PARAM_HEIGHT))));
-            } catch (Exception e) {
-            }
-            aftw.setSize(aftw.getPreferredSize());
-
-            // open in the default platform location
-            Toolkit tk = Toolkit.getDefaultToolkit();
-            Dimension d = tk.getScreenSize();
-            aftw.setLocation((int) (d.getWidth() / 2 - aftw.getWidth() / 2), (int) (d.getHeight() / 2 - aftw.getHeight() / 2));
 
             // open the wizard
+            GUIUtil.centerOnScreen(aftw);
             aftw.setVisible(true);
 
             // lazy load the lazyloadable stuff
             LazyLoadAllSlowStuffAfterGUIRenders.lazyLoad();
 
-            // load the user-specified servers
-            try {
-                for (String server : ParametersUtil.servers) {
-                    ServerPool.addServer(server);
-                }
-            } catch (Exception e) {
-            }
-
             // load the tags
             try {
                 for (String name : ParametersUtil.tags.keySet()) {
                     for (String value : ParametersUtil.tags.get(name)) {
-                        aftw.tagPanel.addTag(name, value);
+                        aftw.getAnnotationFrame().getPanel().add(name, value);
                     }
                 }
             } catch (Exception e) {
@@ -243,17 +170,19 @@ public class Wizard {
             // set the license info
             try {
                 if (ParametersUtil.getParameter(ParametersUtil.PARAM_DEFAULT_LICENSE).equals("public now")) {
-                    aftw.setLicense(License.CC0_PUBLIC);
-                    aftw.setLicenseChoice(false);
+                    aftw.getStep2Panel().cc0Button.doClick();
                 } else if (ParametersUtil.getParameter(ParametersUtil.PARAM_DEFAULT_LICENSE).equals("public later")) {
-                    aftw.setLicense(License.CCO_PRIVATE);
-                    aftw.setLicenseChoice(false);
-                    aftw.setUseRandomPassphrase(true, ParametersUtil.getParameter(ParametersUtil.PARAM_COLLAB_NAME));
+                    aftw.getStep1Panel().encryptionPanel.encryptBox.doClick();
+                    aftw.getStep1Panel().encryptionPanel.random.doClick();
+                    aftw.getStep2Panel().cc0Button.doClick();
                 } else if (ParametersUtil.getParameter(ParametersUtil.PARAM_DEFAULT_LICENSE).equals("custom")) {
-                    //aftw.setLicense(new License("Custom", ParametersUtil.getParameter(ParametersUtil.PARAM_CUSTOM_LICENSE_TEXT), ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_CUSTOM_LICENSE_ENCRYPTED)));
-                    aftw.setLicenseChoice(false);
+                    aftw.getStep2Panel().customButton.doClick();
                     if (ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_CUSTOM_LICENSE_ENCRYPTED)) {
-                        aftw.setUseRandomPassphrase(true, ParametersUtil.getParameter(ParametersUtil.PARAM_COLLAB_NAME));
+                        aftw.getStep1Panel().encryptionPanel.encryptBox.doClick();
+                        aftw.getStep1Panel().encryptionPanel.random.doClick();
+                    }
+                    if (ParametersUtil.getParameter("custom license text") != null) {
+                        aftw.getStep3Panel().customLicensePanel.customLicenseTextArea.setText(ParametersUtil.getParameter("custom license text"));
                     }
                 }
             } catch (Exception e) {
@@ -269,29 +198,9 @@ public class Wizard {
             } catch (Exception e) {
             }
 
-            // set the help url
-            try {
-                aftw.setHelpUrl(ParametersUtil.getParameter(ParametersUtil.PARAM_HELP_URL));
-            } catch (Exception e) {
-            }
-
-            // set the upload parameter defaults
-            try {
-                aftw.setRegister(ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_REGISTER));
-            } catch (Exception e) {
-            }
-            try {
-                aftw.setSkipChunks(ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_SKIP_CHUNKS));
-            } catch (Exception e) {
-            }
-            try {
-                aftw.setUseRemoteRep(ParametersUtil.getBooleanParameter(ParametersUtil.PARAM_REMOTE_REP));
-            } catch (Exception e) {
-            }
-
             // set up the upload structure
             try {
-                aftw.setUploadStructures(ParametersUtil.uploadStructures);
+                aftw.getStep1Panel().setUploadStructures(ParametersUtil.uploadStructures);
             } catch (Exception e) {
             }
 

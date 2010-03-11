@@ -13,6 +13,7 @@ import org.proteomecommons.tranche.scripts.utils.ScriptsUtil;
 import org.tranche.TrancheServer;
 import org.tranche.configuration.ConfigKeys;
 import org.tranche.configuration.Configuration;
+import org.tranche.flatfile.DataDirectoryConfiguration;
 import org.tranche.hash.span.AbstractHashSpan;
 import org.tranche.hash.span.HashSpan;
 import org.tranche.network.*;
@@ -27,8 +28,8 @@ import org.tranche.util.*;
 public class PrintNetworkStatusInfoScript implements TrancheScript {
 
     public static final boolean DEFAULT_REGISTER_SERVERS = false;
-    
     private static final String HR = "------------------------------------------------------------------------------------------------------------------------------------------------------";
+    private static long totalSizeLimit = 0;
 
     /**
      * 
@@ -179,6 +180,8 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
             }
         }
 
+        System.out.println("Total size limit: " + Text.getFormattedBytes(totalSizeLimit));
+
         System.out.println();
         System.out.println("~ fin ~");
     }
@@ -233,6 +236,15 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                 if (buildNumber != null) {
                     System.out.println();
                     System.out.println("Build number: " + buildNumber);
+                }
+
+                for (DataDirectoryConfiguration ddc : config.getDataDirectories()) {
+                    if (ddc.getSizeLimit() == Long.MAX_VALUE) {
+                        continue;
+                    }
+                    System.out.println(ddc.getDirectory());
+                    System.out.println("Size Limit: " + Text.getFormattedBytes(ddc.getSizeLimit()));
+                    totalSizeLimit += ddc.getSizeLimit();
                 }
                 if (name != null) {
                     System.out.println();
