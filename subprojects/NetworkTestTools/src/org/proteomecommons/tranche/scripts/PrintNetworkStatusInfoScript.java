@@ -13,6 +13,7 @@ import org.proteomecommons.tranche.scripts.utils.ScriptsUtil;
 import org.tranche.TrancheServer;
 import org.tranche.configuration.ConfigKeys;
 import org.tranche.configuration.Configuration;
+import org.tranche.configuration.ServerModeFlag;
 import org.tranche.flatfile.DataDirectoryConfiguration;
 import org.tranche.hash.span.AbstractHashSpan;
 import org.tranche.hash.span.HashSpan;
@@ -113,6 +114,33 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
         System.out.println(HR);
         System.out.println("Total online servers: " + count);
         System.out.println(HR);
+        System.out.println();
+        
+        System.out.println(HR);
+        System.out.println("Disk space summary");
+        System.out.println(HR);
+        System.out.println();
+        
+        long writableTotal = 0, writableUsed = 0, nonWritableTotal = 0, nonWritableUsed = 0;
+        int writableCount = 0, nonWritableCount = 0;
+        
+        for (TrancheStatusTableRow row : table.getRows()) {
+            if (row.isAdminWritabled) {
+                writableTotal += row.diskSpace;
+                writableUsed += row.diskSpaceUsed;
+                writableCount++;
+            } else {
+                nonWritableTotal += row.diskSpace;
+                nonWritableUsed += row.diskSpaceUsed;
+                nonWritableCount++;
+            }
+        }
+        
+        System.out.println("                       Total                Used               Available");
+        System.out.println("    Total              "+Text.getFormattedBytes(writableTotal+nonWritableTotal)+"              "+Text.getFormattedBytes(writableUsed+nonWritableUsed)+"            "+Text.getFormattedBytes((writableTotal+nonWritableTotal)-(writableUsed+nonWritableUsed)));
+        System.out.println("    Non-writable ("+nonWritableCount+")   "+Text.getFormattedBytes(nonWritableTotal)+"              "+Text.getFormattedBytes(nonWritableUsed)+"            "+Text.getFormattedBytes(nonWritableTotal-nonWritableUsed));
+        System.out.println("    Writable ("+writableCount+")       "+Text.getFormattedBytes(writableTotal)+"                "+Text.getFormattedBytes(writableUsed)+"            "+Text.getFormattedBytes(writableTotal-writableUsed));
+        
         System.out.println();
 
         table.printTable();
@@ -222,34 +250,52 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                 return null;
             }
 
-            System.out.println();
-            System.out.println(HR);
-            System.out.println(host);
-            System.out.println(HR);
-
             try {
                 Configuration config = IOUtil.getConfiguration(ts, SecurityUtil.getAnonymousCertificate(), SecurityUtil.getAnonymousKey());
 
+                System.out.println();
+                System.out.println(HR);
+
+                String name = config.getName();
+
+                if (name == null || name.trim().equals("")) {
+                    System.out.println(host);
+                } else {
+                    System.out.println(name+" ("+host+")");
+                }
+                System.out.println(HR);
+
                 final String buildNumber = config.getValue(ConfigKeys.BUILD_NUMBER);
-                final String name = config.getValue(ConfigKeys.NAME);
+//                final String name = config.getValue(ConfigKeys.NAME);
 
                 if (buildNumber != null) {
                     System.out.println();
                     System.out.println("Build number: " + buildNumber);
                 }
 
+                System.out.println();
+                System.out.println("Server status (admin): " + config.getValue(ConfigKeys.SERVER_MODE_DESCRIPTION_ADMIN));
+                System.out.println("Server status (system): " + config.getValue(ConfigKeys.SERVER_MODE_DESCRIPTION_SYSTEM));
+                System.out.println();
+
+                long thisServerLimit = 0;
+                
+                System.out.println("Data directories (" + config.getDataDirectories().size() + "):");
                 for (DataDirectoryConfiguration ddc : config.getDataDirectories()) {
-                    if (ddc.getSizeLimit() == Long.MAX_VALUE) {
-                        continue;
-                    }
-                    System.out.println(ddc.getDirectory());
-                    System.out.println("Size Limit: " + Text.getFormattedBytes(ddc.getSizeLimit()));
+                    // Tranche uses DDCs with this value, so include them, even if wrong limit
+//                    if (ddc.getSizeLimit() == Long.MAX_VALUE) {
+//                        continue;
+//                    }
+                    System.out.println("    * " + ddc.getDirectory() + ": " + Text.getFormattedBytes(ddc.getSizeLimit()));
+                    thisServerLimit += ddc.getSizeLimit();
                     totalSizeLimit += ddc.getSizeLimit();
                 }
-                if (name != null) {
-                    System.out.println();
-                    System.out.println("Name: " + name);
-                }
+
+                System.out.println();
+                System.out.println("    Total size ... " + config.getValue(ConfigKeys.TOTAL_SIZE));
+                System.out.println("    Used ......... " + config.getValue(ConfigKeys.TOTAL_SIZE_USED));
+                System.out.println("    Available .... " + config.getValue(ConfigKeys.TOTAL_SIZE_UNUSED));
+               
                 System.out.println();
                 System.out.println("Hash spans for <" + host + ">: " + config.getHashSpans().size());
                 System.out.println();
@@ -260,7 +306,7 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                 }
 
                 System.out.println();
-                System.out.println("Target hash spans for <" + host + ">: " + config.getTargetHashSpans().size());
+                System.out.println("Target hash spans: " + config.getTargetHashSpans().size());
                 System.out.println();
                 for (HashSpan hs : config.getTargetHashSpans()) {
                     AbstractHashSpan ahs = new AbstractHashSpan(hs);
@@ -304,8 +350,21 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                 System.out.println("    Readable/Writable: " + onlineReadableAndWritable);
                 System.out.println();
                 System.out.println("    Total:             " + total);
+                
+                
+                final byte serverModeAdmin = Byte.parseByte(config.getValue(ConfigKeys.SERVER_MODE_FLAG_ADMIN));
+                final boolean isAdminWritable = ServerModeFlag.canWrite(serverModeAdmin);
+                
+                final long totalDisk = thisServerLimit;
+                long totalDiskSpaceUsed = 0;
+                
+                for (String key : config.getValueKeys()) {
+                    if (key.startsWith("actualBytesUsed:")) {
+                        totalDiskSpaceUsed += Long.parseLong(config.getValue(key));
+                    }
+                }
 
-                TrancheStatusTableRow trow = new TrancheStatusTableRow(host, name, buildNumber, IOUtil.createURL(ts));
+                TrancheStatusTableRow trow = new TrancheStatusTableRow(host, name, buildNumber, IOUtil.createURL(ts), isAdminWritable, totalDisk, totalDiskSpaceUsed);
                 trow.add(t);
 
                 return trow;
@@ -321,6 +380,4 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
             }
         }
     }
-
-    
 }
