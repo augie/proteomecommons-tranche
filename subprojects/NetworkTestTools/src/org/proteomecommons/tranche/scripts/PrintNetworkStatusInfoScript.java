@@ -363,8 +363,19 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                         totalDiskSpaceUsed += Long.parseLong(config.getValue(key));
                     }
                 }
+                
+                boolean isStartingUp = true;
+                
+                // Determine whether server is still starting up
+                {
+                    byte systemFlag = Byte.parseByte(config.getValue(ConfigKeys.SERVER_MODE_FLAG_SYSTEM));
+                    
+                    if (ServerModeFlag.canRead(systemFlag) && ServerModeFlag.canWrite(systemFlag)) {
+                        isStartingUp = false;
+                    }
+                }
 
-                TrancheStatusTableRow trow = new TrancheStatusTableRow(host, name, buildNumber, IOUtil.createURL(ts), isAdminWritable, totalDisk, totalDiskSpaceUsed);
+                TrancheStatusTableRow trow = new TrancheStatusTableRow(host, name, buildNumber, IOUtil.createURL(ts), isAdminWritable, totalDisk, totalDiskSpaceUsed, isStartingUp);
                 trow.add(t);
 
                 return trow;

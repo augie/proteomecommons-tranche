@@ -44,6 +44,7 @@ public class TrancheStatusTable {
 
         final int nameLen = 40;
         final int buildLen = 6;
+        final int loadingLen = 0;
         final int fieldLen = 5;
         String hr = null;
 
@@ -73,7 +74,10 @@ public class TrancheStatusTable {
             for (int i = 0; i < nameLen; i++) {
                 hrBuf.append("-");
             }
-            for (int i = 0; i < buildLen+1; i++) {
+            for (int i = 0; i < buildLen + 1; i++) {
+                hrBuf.append("-");
+            }
+            for (int i = 0; i < loadingLen + 1; i++) {
                 hrBuf.append("-");
             }
             for (Integer nextKey : keys.keySet()) {
@@ -103,15 +107,28 @@ public class TrancheStatusTable {
             {
                 final String label = "build";
                 final int keyDiff = buildLen - label.length();
-                
+
                 StringBuffer header = new StringBuffer();
                 header.append(label);
-                for (int i=0; i<keyDiff; i++) {
+                for (int i = 0; i < keyDiff; i++) {
                     header.append(" ");
                 }
-                System.out.print("|"+header.toString());
+                System.out.print("|" + header.toString());
             }
-            
+
+            // Print out header for starting up
+            {
+                final String label = "Loading ";
+                final int keyDiff = buildLen - label.length();
+
+                StringBuffer header = new StringBuffer();
+                header.append(label);
+                for (int i = 0; i < keyDiff; i++) {
+                    header.append(" ");
+                }
+                System.out.print("|" + header.toString());
+            }
+
             // Print out headers for other servers
             for (Integer nextKey : keyList) {
                 StringBuffer keyBuf = new StringBuffer();
@@ -157,19 +174,31 @@ public class TrancheStatusTable {
             }
 
             System.out.print(nameBuf);
-            
+
             // Print out build
             {
                 final String buildNumber = (row.buildNumber == null ? "" : row.buildNumber);
                 final int diff = buildLen - buildNumber.length();
-                
+
                 StringBuffer val = new StringBuffer();
                 val.append(buildNumber);
-                for (int i=0; i<diff; i++) {
+                for (int i = 0; i < diff; i++) {
                     val.append(" ");
                 }
-                
-                System.out.print("|"+val);
+
+                System.out.print("|" + val);
+            }
+
+            // Print out whether loading
+            {
+                if (row.isStartingUp) {
+
+                    System.out.print("| yes    ");
+
+                } else {
+                    
+                    System.out.print("| -      ");
+                }
             }
 
             for (Integer nextKey : keyList) {

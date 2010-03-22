@@ -17,7 +17,7 @@ public class TrancheStatusTableRow implements Comparable {
 
     private final List<TrancheStatusTableEntry> entries;
     public final String host,  name,  buildNumber,  url;
-    public final boolean isAdminWritabled;
+    public final boolean isAdminWritabled, isStartingUp;
     public final long diskSpace,  diskSpaceUsed;
 
     /**
@@ -26,7 +26,7 @@ public class TrancheStatusTableRow implements Comparable {
      * @param name
      * @param buildNumber
      */
-    public TrancheStatusTableRow(String host, String name, String buildNumber, String url, boolean isAdminWritable, long diskSpace, long diskSpaceUsed) {
+    public TrancheStatusTableRow(String host, String name, String buildNumber, String url, boolean isAdminWritable, long diskSpace, long diskSpaceUsed, boolean isStartingUp) {
         this.host = host;
         this.name = name;
         this.buildNumber = buildNumber;
@@ -35,6 +35,7 @@ public class TrancheStatusTableRow implements Comparable {
         this.isAdminWritabled = isAdminWritable;
         this.diskSpace = diskSpace;
         this.diskSpaceUsed = diskSpaceUsed;
+        this.isStartingUp = isStartingUp;
     }
 
     public void add(StatusTable t) {
