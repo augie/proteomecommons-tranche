@@ -310,17 +310,17 @@ public class ReplicationCountScript {
 
         // notify
         if (!emails.isEmpty() && reps0 > 0) {
-            String email = "ProteomeCommons.org Tranche Repository\n" +
-                    "A data set has been found to be missing chunks:\n\n" +
-                    "<a href=\"https://proteomecommons.org/dataset.jsp?i=" + projectHash.toWebSafeString() + "\">ProteomeCommons.org Data Page</a>\n" +
-                    "Data Set Hash: " + projectHash + "\n" +
-                    "Chunks with 0 replications: " + String.valueOf(reps0) + "\n" +
-                    "Chunks with 1 replications: " + String.valueOf(reps1) + "\n" +
-                    "Chunks with 2 replications: " + String.valueOf(reps2) + "\n" +
-                    "Chunks with 3 replications: " + String.valueOf(reps3) + "\n" +
-                    "Chunks with 4 replications: " + String.valueOf(reps4) + "\n" +
-                    "Chunks with 5+ replications: " + String.valueOf(reps5Plus) + "\n" +
-                    "Connections (" + ConnectionUtil.size() + "):\n";
+            String email = "ProteomeCommons.org Tranche Repository\n"
+                    + "A data set has been found to be missing chunks:\n\n"
+                    + "<a href=\"https://proteomecommons.org/dataset.jsp?i=" + projectHash.toWebSafeString() + "\">ProteomeCommons.org Data Page</a>\n"
+                    + "Data Set Hash: " + projectHash + "\n"
+                    + "Chunks with 0 replications: " + String.valueOf(reps0) + "\n"
+                    + "Chunks with 1 replications: " + String.valueOf(reps1) + "\n"
+                    + "Chunks with 2 replications: " + String.valueOf(reps2) + "\n"
+                    + "Chunks with 3 replications: " + String.valueOf(reps3) + "\n"
+                    + "Chunks with 4 replications: " + String.valueOf(reps4) + "\n"
+                    + "Chunks with 5+ replications: " + String.valueOf(reps5Plus) + "\n"
+                    + "Connections (" + ConnectionUtil.size() + "):\n";
             for (String server : ConnectionUtil.getConnectedHosts()) {
                 email = email + "   " + server + "\n";
             }
@@ -691,12 +691,19 @@ public class ReplicationCountScript {
                             for (String host : ConnectionUtil.getConnectedHosts()) {
                                 try {
                                     TrancheServer ts = ConnectionUtil.connectHost(host, true);
-                                    PropagationReturnWrapper pew = IOUtil.getMetaData(ts, metaDataHash, false);
-                                    if (pew != null && pew.isByteArrayDoubleDimension()) {
-                                        metaDataBytes = ((byte[][]) pew.getReturnValueObject())[0];
-                                        if (metaDataBytes != null) {
-                                            break;
+                                    if (ts == null) {
+                                        throw new Exception();
+                                    }
+                                    try {
+                                        PropagationReturnWrapper pew = IOUtil.getMetaData(ts, metaDataHash, false);
+                                        if (pew != null && pew.isByteArrayDoubleDimension()) {
+                                            metaDataBytes = ((byte[][]) pew.getReturnValueObject())[0];
+                                            if (metaDataBytes != null) {
+                                                break;
+                                            }
                                         }
+                                    } finally {
+                                        ConnectionUtil.unlockConnection(host);
                                     }
                                 } catch (Exception e) {
                                 }
@@ -705,7 +712,16 @@ public class ReplicationCountScript {
                                 for (String host : ConnectionUtil.getConnectedHosts()) {
                                     try {
                                         TrancheServer ts = ConnectionUtil.connectHost(host, true);
-                                        IOUtil.setMetaData(ts, userZipFile.getCertificate(), userZipFile.getPrivateKey(), false, metaDataHash, metaDataBytes);
+                                        if (ts == null) {
+                                            throw new Exception();
+                                        }
+                                        try {
+                                            if (!IOUtil.hasMetaData(ts, metaDataHash)) {
+                                                IOUtil.setMetaData(ts, userZipFile.getCertificate(), userZipFile.getPrivateKey(), false, metaDataHash, metaDataBytes);
+                                            }
+                                        } finally {
+                                            ConnectionUtil.unlockConnection(host);
+                                        }
                                     } catch (Exception e) {
                                     }
                                 }
@@ -725,12 +741,19 @@ public class ReplicationCountScript {
                             for (String host : ConnectionUtil.getConnectedHosts()) {
                                 try {
                                     TrancheServer ts = ConnectionUtil.connectHost(host, true);
-                                    PropagationReturnWrapper pew = IOUtil.getData(ts, dataHash, false);
-                                    if (pew != null && pew.isByteArrayDoubleDimension()) {
-                                        dataBytes = ((byte[][]) pew.getReturnValueObject())[0];
-                                        if (dataBytes != null) {
-                                            break;
+                                    if (ts == null) {
+                                        throw new Exception();
+                                    }
+                                    try {
+                                        PropagationReturnWrapper pew = IOUtil.getData(ts, dataHash, false);
+                                        if (pew != null && pew.isByteArrayDoubleDimension()) {
+                                            dataBytes = ((byte[][]) pew.getReturnValueObject())[0];
+                                            if (dataBytes != null) {
+                                                break;
+                                            }
                                         }
+                                    } finally {
+                                        ConnectionUtil.unlockConnection(host);
                                     }
                                 } catch (Exception e) {
                                 }
@@ -739,7 +762,16 @@ public class ReplicationCountScript {
                                 for (String host : ConnectionUtil.getConnectedHosts()) {
                                     try {
                                         TrancheServer ts = ConnectionUtil.connectHost(host, true);
-                                        IOUtil.setData(ts, userZipFile.getCertificate(), userZipFile.getPrivateKey(), dataHash, dataBytes);
+                                        if (ts == null) {
+                                            throw new Exception();
+                                        }
+                                        try {
+                                            if (!IOUtil.hasData(ts, dataHash)) {
+                                                IOUtil.setData(ts, userZipFile.getCertificate(), userZipFile.getPrivateKey(), dataHash, dataBytes);
+                                            }
+                                        } finally {
+                                            ConnectionUtil.unlockConnection(host);
+                                        }
                                     } catch (Exception e) {
                                     }
                                 }
@@ -793,8 +825,8 @@ public class ReplicationCountScript {
             pairs.add(new NameValuePair("username", username));
 
             NameValuePair[] pairArray = new NameValuePair[pairs.size()];
-            for (int i = 0; i <
-                    pairs.size(); i++) {
+            for (int i = 0; i
+                    < pairs.size(); i++) {
                 pairArray[i] = pairs.get(i);
             }
 
