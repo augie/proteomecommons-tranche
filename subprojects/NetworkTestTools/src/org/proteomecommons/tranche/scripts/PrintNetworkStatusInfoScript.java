@@ -4,9 +4,14 @@
  */
 package org.proteomecommons.tranche.scripts;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import org.proteomecommons.tranche.ProteomeCommonsTrancheConfig;
+import org.proteomecommons.tranche.scripts.sets.PowerSet;
 import org.proteomecommons.tranche.scripts.status.TrancheStatusTable;
 import org.proteomecommons.tranche.scripts.status.TrancheStatusTableRow;
 import org.proteomecommons.tranche.scripts.utils.ScriptsUtil;
@@ -31,6 +36,7 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
     public static final boolean DEFAULT_REGISTER_SERVERS = false;
     private static final String HR = "------------------------------------------------------------------------------------------------------------------------------------------------------";
     private static long totalSizeLimit = 0;
+    private static List<AbstractHashSpan> writableHashSpans = new LinkedList(),  writableTargetHashSpans = new LinkedList();
 
     /**
      * 
@@ -115,15 +121,15 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
         System.out.println("Total online servers: " + count);
         System.out.println(HR);
         System.out.println();
-        
+
         System.out.println(HR);
         System.out.println("Disk space summary");
         System.out.println(HR);
         System.out.println();
-        
+
         long writableTotal = 0, writableUsed = 0, nonWritableTotal = 0, nonWritableUsed = 0;
         int writableCount = 0, nonWritableCount = 0;
-        
+
         for (TrancheStatusTableRow row : table.getRows()) {
             if (row.isAdminWritabled) {
                 writableTotal += row.diskSpace;
@@ -135,15 +141,24 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                 nonWritableCount++;
             }
         }
-        
+
         System.out.println("                       Total                Used               Available");
-        System.out.println("    Total              "+Text.getFormattedBytes(writableTotal+nonWritableTotal)+"              "+Text.getFormattedBytes(writableUsed+nonWritableUsed)+"            "+Text.getFormattedBytes((writableTotal+nonWritableTotal)-(writableUsed+nonWritableUsed)));
-        System.out.println("    Non-writable ("+nonWritableCount+")   "+Text.getFormattedBytes(nonWritableTotal)+"              "+Text.getFormattedBytes(nonWritableUsed)+"            "+Text.getFormattedBytes(nonWritableTotal-nonWritableUsed));
-        System.out.println("    Writable ("+writableCount+")       "+Text.getFormattedBytes(writableTotal)+"                "+Text.getFormattedBytes(writableUsed)+"            "+Text.getFormattedBytes(writableTotal-writableUsed));
-        
+        System.out.println("    Total              " + Text.getFormattedBytes(writableTotal + nonWritableTotal) + "              " + Text.getFormattedBytes(writableUsed + nonWritableUsed) + "            " + Text.getFormattedBytes((writableTotal + nonWritableTotal) - (writableUsed + nonWritableUsed)));
+        System.out.println("    Non-writable (" + nonWritableCount + ")   " + Text.getFormattedBytes(nonWritableTotal) + "              " + Text.getFormattedBytes(nonWritableUsed) + "            " + Text.getFormattedBytes(nonWritableTotal - nonWritableUsed));
+        System.out.println("    Writable (" + writableCount + ")       " + Text.getFormattedBytes(writableTotal) + "                " + Text.getFormattedBytes(writableUsed) + "            " + Text.getFormattedBytes(writableTotal - writableUsed));
+
         System.out.println();
 
         table.printTable();
+
+        System.out.println();
+        System.out.println("Writable hash spans:");
+        System.out.println("    - Target: " + getHashSpanCount(writableTargetHashSpans) + " (at least)");
+        System.out.println("    - Normal: " + getHashSpanCount(writableHashSpans) + " (at least)");
+
+        System.out.println();
+        System.out.println("Total size limit: " + Text.getFormattedBytes(totalSizeLimit));
+        System.out.println();
 
         if (isRegister) {
             System.out.println();
@@ -208,12 +223,119 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
             }
         }
 
-        System.out.println("Total size limit: " + Text.getFormattedBytes(totalSizeLimit));
-
         System.out.println();
         System.out.println("~ fin ~");
     }
 
+    private static int getHashSpanCount(Collection<AbstractHashSpan> spans) {
+
+        List<AbstractHashSpan> partialSpans = new LinkedList();
+
+        int count = 0;
+        for (AbstractHashSpan ahs : spans) {
+
+            // If it is full, count it
+            if (ahs.getAbstractionFirst() == AbstractHashSpan.ABSTRACTION_FIRST && ahs.getAbstractionLast() == AbstractHashSpan.ABSTRACTION_LAST) {
+                count++;
+                continue;
+            }
+
+            partialSpans.add(ahs);
+        }
+
+        while (isFindAnotherHashSpan(partialSpans)) {
+            count++;
+        }
+
+        return count;
+    }
+
+    /**
+     * 
+     */
+    private static boolean isFindAnotherHashSpan(List<AbstractHashSpan> spans) {
+
+        PowerSet powerSet = new PowerSet(spans);
+
+        Iterator<Set<AbstractHashSpan>> powerSetIterator = powerSet.iterator();
+
+        Set<AbstractHashSpan> subset = null;
+        boolean wasSuccess = false;
+
+        LOOK_FOR_COMPLETE_SUBSET:
+        while (powerSetIterator.hasNext()) {
+
+            subset = powerSetIterator.next();
+
+            if (isCompleteHashSpan(subset)) {
+                wasSuccess = true;
+                break LOOK_FOR_COMPLETE_SUBSET;
+            }
+        }
+
+        // If was a success, remove from parent collection
+        if (wasSuccess) {
+            spans.removeAll(subset);
+        }
+
+        return wasSuccess;
+    }
+
+    /**
+     * 
+     * @param set
+     * @return
+     */
+    private static boolean isCompleteHashSpan(Set<AbstractHashSpan> set) {
+
+        // This is a complete hash span if 
+        // 1. Hash span start is found
+        // 2. Hash span is found
+        // 3. All elements overlap
+        // 
+        // Admittedly, #3 is not required because a superfluous hash span would be included. However,
+        // if this is the case, the correct subset will be found anyhow. =)
+        boolean isFirstHashFound = false;
+        boolean isLastHashFound = false;
+        boolean isAllOverlap = true;
+
+        CHECK:
+        for (AbstractHashSpan ahs : set) {
+            if (ahs.getAbstractionFirst() == AbstractHashSpan.ABSTRACTION_FIRST) {
+                isFirstHashFound = true;
+            }
+            if (ahs.getAbstractionLast() == AbstractHashSpan.ABSTRACTION_LAST) {
+                isLastHashFound = true;
+            }
+
+            boolean foundOverlap = false;
+
+            // Look for overlap with this with any other member of subset
+            for (AbstractHashSpan otherAhs : set) {
+                if (otherAhs.getAbstractionFirst() == ahs.getAbstractionFirst() && otherAhs.getAbstractionLast() == ahs.getAbstractionLast()) {
+                    continue;
+                }
+
+                if (ahs.overlaps(otherAhs) || ahs.isAdjecentTo(otherAhs)) {
+                    foundOverlap = true;
+                }
+            }
+
+            if (!foundOverlap) {
+                isAllOverlap = false;
+                break CHECK;
+            }
+        }
+
+        return isFirstHashFound && isLastHashFound && isAllOverlap;
+    }
+
+    /**
+     * 
+     * @param host
+     * @return
+     * @throws java.lang.Exception
+     */
     private static TrancheStatusTableRow getServerInformationByHost(final String host) throws Exception {
         final boolean isConnected = ConnectionUtil.isConnected(host);
 
@@ -261,7 +383,7 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                 if (name == null || name.trim().equals("")) {
                     System.out.println(host);
                 } else {
-                    System.out.println(name+" ("+host+")");
+                    System.out.println(name + " (" + host + ")");
                 }
                 System.out.println(HR);
 
@@ -279,7 +401,7 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                 System.out.println();
 
                 long thisServerLimit = 0;
-                
+
                 System.out.println("Data directories (" + config.getDataDirectories().size() + "):");
                 for (DataDirectoryConfiguration ddc : config.getDataDirectories()) {
                     // Tranche uses DDCs with this value, so include them, even if wrong limit
@@ -295,7 +417,7 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                 System.out.println("    Total size ... " + config.getValue(ConfigKeys.TOTAL_SIZE));
                 System.out.println("    Used ......... " + config.getValue(ConfigKeys.TOTAL_SIZE_USED));
                 System.out.println("    Available .... " + config.getValue(ConfigKeys.TOTAL_SIZE_UNUSED));
-               
+
                 System.out.println();
                 System.out.println("Hash spans for <" + host + ">: " + config.getHashSpans().size());
                 System.out.println();
@@ -303,6 +425,10 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                     AbstractHashSpan ahs = new AbstractHashSpan(hs);
                     System.out.println("    - Start:  " + ahs.getAbstractionFirst());
                     System.out.println("      Finish: " + ahs.getAbstractionLast());
+
+                    if (config.canWrite()) {
+                        writableHashSpans.add(ahs);
+                    }
                 }
 
                 System.out.println();
@@ -312,10 +438,14 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                     AbstractHashSpan ahs = new AbstractHashSpan(hs);
                     System.out.println("    - Start:  " + ahs.getAbstractionFirst());
                     System.out.println("      Finish: " + ahs.getAbstractionLast());
+
+                    if (config.canWrite()) {
+                        writableTargetHashSpans.add(ahs);
+                    }
                 }
 
                 StatusTable t = ts.getNetworkStatusPortion(GetNetworkStatusItem.RETURN_ALL, GetNetworkStatusItem.RETURN_ALL);
-                int online = 0, total = 0, core = 0, onlineCore = 0, onlineReadable = 0, onlineWritable = 0, onlineReadableAndWritable = 0;
+                int online = 0,  total = 0,  core = 0,  onlineCore = 0,  onlineReadable = 0,  onlineWritable = 0,  onlineReadableAndWritable = 0;
 
                 for (StatusTableRow r : t.getRows()) {
                     total++;
@@ -350,26 +480,26 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
                 System.out.println("    Readable/Writable: " + onlineReadableAndWritable);
                 System.out.println();
                 System.out.println("    Total:             " + total);
-                
-                
+
+
                 final byte serverModeAdmin = Byte.parseByte(config.getValue(ConfigKeys.SERVER_MODE_FLAG_ADMIN));
                 final boolean isAdminWritable = ServerModeFlag.canWrite(serverModeAdmin);
-                
+
                 final long totalDisk = thisServerLimit;
                 long totalDiskSpaceUsed = 0;
-                
+
                 for (String key : config.getValueKeys()) {
                     if (key.startsWith("actualBytesUsed:")) {
                         totalDiskSpaceUsed += Long.parseLong(config.getValue(key));
                     }
                 }
-                
+
                 boolean isStartingUp = true;
-                
+
                 // Determine whether server is still starting up
                 {
                     byte systemFlag = Byte.parseByte(config.getValue(ConfigKeys.SERVER_MODE_FLAG_SYSTEM));
-                    
+
                     if (ServerModeFlag.canRead(systemFlag) && ServerModeFlag.canWrite(systemFlag)) {
                         isStartingUp = false;
                     }
