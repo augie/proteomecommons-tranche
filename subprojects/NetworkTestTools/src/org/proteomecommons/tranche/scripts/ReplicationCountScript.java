@@ -25,6 +25,7 @@ import org.tranche.hash.BigHash;
 import org.tranche.meta.MetaData;
 import org.tranche.network.ConnectionUtil;
 import org.tranche.network.NetworkUtil;
+import org.tranche.network.StatusTable;
 import org.tranche.network.StatusTableRow;
 import org.tranche.project.ProjectFile;
 import org.tranche.project.ProjectFilePart;
@@ -678,9 +679,11 @@ public class ReplicationCountScript {
                     } catch (Exception e) {
                     }
                 }
+                final UserZipFile finalUserZipFile = userZipFile;
+                final StatusTable finalTable = NetworkUtil.getStatus();
 
                 // input the rep counts
-                for (BigHash metaDataHash : metaHashes.keySet()) {
+                for (final BigHash metaDataHash : metaHashes.keySet()) {
                     int repCount = metaHashes.get(metaDataHash);
                     if (repCount >= 5) {
                         reps[5]++;
@@ -709,19 +712,35 @@ public class ReplicationCountScript {
                                 }
                             }
                             if (metaDataBytes != null) {
-                                for (String host : ConnectionUtil.getConnectedHosts()) {
-                                    try {
-                                        TrancheServer ts = ConnectionUtil.connectHost(host, true);
-                                        if (ts == null) {
-                                            throw new Exception();
-                                        }
-                                        try {
-                                            if (!IOUtil.hasMetaData(ts, metaDataHash)) {
-                                                IOUtil.setMetaData(ts, userZipFile.getCertificate(), userZipFile.getPrivateKey(), false, metaDataHash, metaDataBytes);
+                                final byte[] finalMetaDataBytes = metaDataBytes;
+                                Set<Thread> threads = new HashSet<Thread>();
+                                for (final String host : ConnectionUtil.getConnectedHosts()) {
+                                    Thread t = new Thread() {
+
+                                        public void run() {
+                                            try {
+                                                TrancheServer ts = ConnectionUtil.connectHost(host, true);
+                                                if (ts == null) {
+                                                    throw new Exception();
+                                                }
+                                                try {
+                                                    if (finalTable.getRow(host).isWritable() && !IOUtil.hasMetaData(ts, metaDataHash)) {
+                                                        IOUtil.setMetaData(ts, finalUserZipFile.getCertificate(), finalUserZipFile.getPrivateKey(), false, metaDataHash, finalMetaDataBytes);
+                                                    }
+                                                } finally {
+                                                    ConnectionUtil.unlockConnection(host);
+                                                }
+                                            } catch (Exception e) {
                                             }
-                                        } finally {
-                                            ConnectionUtil.unlockConnection(host);
                                         }
+                                    };
+                                    t.setDaemon(true);
+                                    t.start();
+                                    threads.add(t);
+                                }
+                                for (Thread t : threads) {
+                                    try {
+                                        t.join();
                                     } catch (Exception e) {
                                     }
                                 }
@@ -730,7 +749,7 @@ public class ReplicationCountScript {
                         reps[repCount]++;
                     }
                 }
-                for (BigHash dataHash : dataHashes.keySet()) {
+                for (final BigHash dataHash : dataHashes.keySet()) {
                     int repCount = dataHashes.get(dataHash);
                     if (repCount >= 5) {
                         reps[5]++;
@@ -759,19 +778,35 @@ public class ReplicationCountScript {
                                 }
                             }
                             if (dataBytes != null) {
-                                for (String host : ConnectionUtil.getConnectedHosts()) {
-                                    try {
-                                        TrancheServer ts = ConnectionUtil.connectHost(host, true);
-                                        if (ts == null) {
-                                            throw new Exception();
-                                        }
-                                        try {
-                                            if (!IOUtil.hasData(ts, dataHash)) {
-                                                IOUtil.setData(ts, userZipFile.getCertificate(), userZipFile.getPrivateKey(), dataHash, dataBytes);
+                                final byte[] finalDataBytes = dataBytes;
+                                Set<Thread> threads = new HashSet<Thread>();
+                                for (final String host : ConnectionUtil.getConnectedHosts()) {
+                                    Thread t = new Thread() {
+
+                                        public void run() {
+                                            try {
+                                                TrancheServer ts = ConnectionUtil.connectHost(host, true);
+                                                if (ts == null) {
+                                                    throw new Exception();
+                                                }
+                                                try {
+                                                    if (finalTable.getRow(host).isWritable() && !IOUtil.hasData(ts, dataHash)) {
+                                                        IOUtil.setData(ts, finalUserZipFile.getCertificate(), finalUserZipFile.getPrivateKey(), dataHash, finalDataBytes);
+                                                    }
+                                                } finally {
+                                                    ConnectionUtil.unlockConnection(host);
+                                                }
+                                            } catch (Exception e) {
                                             }
-                                        } finally {
-                                            ConnectionUtil.unlockConnection(host);
                                         }
+                                    };
+                                    t.setDaemon(true);
+                                    t.start();
+                                    threads.add(t);
+                                }
+                                for (Thread t : threads) {
+                                    try {
+                                        t.join();
                                     } catch (Exception e) {
                                     }
                                 }
