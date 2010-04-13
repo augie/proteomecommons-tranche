@@ -42,8 +42,8 @@ import org.tranche.util.Text;
  */
 public class InjectDataFromDataBlocksScript implements TrancheScript {
 
-    private final static int DEFAULT_PREFERRED_COPIES = 2;
-    private final static int DEFAULT_REQUIRED_COPIES = 1;
+    private final static int DEFAULT_PREFERRED_COPIES = 3;
+    private final static int DEFAULT_REQUIRED_COPIES = 2;
     private static final int DEFAULT_THREAD_COUNT_LIMIT = 10;
     private static final boolean DEFAULT_IS_VERBOSE = false;
     private static int preferredCopies = DEFAULT_PREFERRED_COPIES;
