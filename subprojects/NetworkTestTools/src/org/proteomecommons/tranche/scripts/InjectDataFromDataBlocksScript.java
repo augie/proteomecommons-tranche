@@ -483,6 +483,11 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
         injectChunk(bytes, hash, true, uzf);
     }
 
+    static enum Status {
+
+        Injected, Failed, Skipped
+    };
+
     /**
      * 
      * @param bytes
@@ -497,6 +502,51 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
             @Override()
             public void run() {
 
+                final String chunkType = isMetaData ? "meta data" : "data";
+
+                // Try up to three times before bailing. Since the script aborts on first error, little overhead
+                // for trying multiple times
+                final int MAX_ATTEMPTS = 3;
+                
+                ATTEMPT:
+                for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+                    
+                    Status s = performInjection(bytes, hash, isMetaData, uzf);
+
+                    switch (s) {
+
+                        case Injected:
+                            injectionSuccessCount++;
+                            if (isVerbose) {
+                                System.out.println("INJECTED: " + chunkType + " chunk: " + hash);
+                            }
+                            return;
+
+                        case Skipped:
+                            injectionSkippedCount++;
+                            if (isVerbose) {
+                                System.out.println("SKIPPED: " + chunkType + " chunk: " + hash);
+                            }
+                            return;
+
+                        case Failed:
+                            System.err.println("FAILED: Attempt #" + attempt + " of " + MAX_ATTEMPTS + " for " + chunkType + " chunk: " + hash);
+                            continue ATTEMPT;
+
+                        default:
+                            System.err.println("Unrecognized status flag: " + s);
+
+                    }
+                }
+
+                // If gets here, failed
+                isFailure[0] = true;
+            }
+
+            /**
+             * 
+             */
+            private Status performInjection(final byte[] bytes, final BigHash hash, final boolean isMetaData, final UserZipFile uzf) {
                 final String chunkType = isMetaData ? "meta data" : "data";
 
                 int injectionCount = 0;
@@ -523,9 +573,9 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
                 if (hostsToUse.size() < requiredCopies) {
                     throw new RuntimeException("Require " + requiredCopies + " cop(ies) of chunk, but only " + hostsToUse.size() + " host(s) available.");
                 }
-                
+
                 Collections.shuffle(hostsToUse);
-       
+
                 Set<String> hostsToRemove = new HashSet();
 
                 SERVERS_WITH_COPIES:
@@ -552,11 +602,8 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
 
                             // If found enough copies online already, bail
                             if (injectionCount >= preferredCopies) {
-                                injectionSkippedCount++;
-                                if (isVerbose) {
-                                    System.out.println("SKIPPED: " + chunkType + " chunk: " + hash);
-                                }
-                                return;
+
+                                return Status.Skipped;
                             }
                         }
 
@@ -603,11 +650,7 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
 
                             // If enough copies online now, bail
                             if (injectionCount >= preferredCopies) {
-                                if (isVerbose) {
-                                    System.out.println("INJECTED: "+ injectionCount + " copies of " + chunkType + " chunk: " + hash);
-                                }
-                                injectionSuccessCount++;
-                                return;
+                                return Status.Injected;
                             }
                         }
 
@@ -624,15 +667,11 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
 
                 // If get here, didn't get number of preferred copies. Need to check if at least met required count.
                 if (injectionCount < requiredCopies) {
-                    System.err.println("Failed: only injected " + injectionCount + " of " + requiredCopies + " required replications for " + chunkType + " chunk: " + hash);
-                    isFailure[0] = true;
+                    return Status.Failed;
                 } else {
-                    if (isVerbose) {
-                        System.out.println("INJECTED: "+ injectionCount + " copies of " + chunkType + " chunk: " + hash);
-                    }
-                    injectionSuccessCount++;
+                    return Status.Injected;
                 }
-            } // run
+            }
         };
         t.setDaemon(true);
         t.setPriority(Thread.MIN_PRIORITY);
