@@ -45,7 +45,7 @@ public class TrancheStatusTable {
 
         final int nameLen = 40;
         final int buildLen = 6;
-        final int loadingLen = 0;
+        final int loadingLen = 12;
         final int fieldLen = 5;
         final int availableSpaceLen = 15;
         String hr = null;
@@ -123,8 +123,8 @@ public class TrancheStatusTable {
 
             // Print out header for starting up
             {
-                final String label = "Loading ";
-                final int keyDiff = buildLen - label.length();
+                final String label = "DBU Loading ";
+                final int keyDiff = loadingLen - label.length();
 
                 StringBuffer header = new StringBuffer();
                 header.append(label);
@@ -209,32 +209,37 @@ public class TrancheStatusTable {
 
             // Print out whether loading
             {
+                StringBuffer buf = new StringBuffer();
+
                 if (row.isStartingUp) {
-
-                    System.out.print("| yes    ");
-
+                    buf.append("yes");
                 } else {
-
-                    System.out.print("| -      ");
+                    buf.append("-");
                 }
+
+                while (buf.length() < loadingLen - 1) {
+                    buf.append(" ");
+                }
+
+                System.out.print("| " + buf);
             }
 
             // Print out available space
             {
                 StringBuffer buf = new StringBuffer();
-                
+
                 // If not writeable, just put -
                 if (!row.isAdminWritabled) {
                     buf.append("-");
                 } else {
-                    buf.append(Text.getFormattedBytes(row.diskSpace-row.diskSpaceUsed));
+                    buf.append(Text.getFormattedBytes(row.diskSpace - row.diskSpaceUsed));
                 }
 
-                while (buf.length() < availableSpaceLen) {
+                while (buf.length() < availableSpaceLen - 1) {
                     buf.append(" ");
                 }
 
-                System.out.print("|" + buf);
+                System.out.print("| " + buf);
             }
 
             for (Integer nextKey : keyList) {

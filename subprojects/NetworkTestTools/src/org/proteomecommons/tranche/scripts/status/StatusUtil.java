@@ -259,14 +259,20 @@ public class StatusUtil {
                     }
                 }
 
-                boolean isStartingUp = true;
+                boolean isStartingUp = false;
 
                 // Determine whether server is still starting up
                 {
-                    byte systemFlag = Byte.parseByte(config.getValue(ConfigKeys.SERVER_MODE_FLAG_SYSTEM));
-
-                    if (ServerModeFlag.canRead(systemFlag) && ServerModeFlag.canWrite(systemFlag)) {
-                        isStartingUp = false;
+//                    byte systemFlag = Byte.parseByte(config.getValue(ConfigKeys.SERVER_MODE_FLAG_SYSTEM));
+//
+//                    if (ServerModeFlag.canRead(systemFlag) && ServerModeFlag.canWrite(systemFlag)) {
+//                        isStartingUp = false;
+//                    }
+                    
+                    String serverStartupMessage = config.getValue(ConfigKeys.SERVER_STARTUP_THREAD_STATUS);
+                    
+                    if (serverStartupMessage != null && serverStartupMessage.contains("Waiting for datablocks to load")) {
+                        isStartingUp = true;
                     }
                 }
 
