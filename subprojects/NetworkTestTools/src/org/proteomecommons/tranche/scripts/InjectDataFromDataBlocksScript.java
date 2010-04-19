@@ -497,6 +497,11 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
      */
     private static void injectChunk(final byte[] bytes, final BigHash hash, final boolean isMetaData, final UserZipFile uzf) {
 
+        // If chunk is corrupted or invalid, skip it. Remote server will reject it anyhow.
+        if (!isValidChunk(bytes, hash, isMetaData)) {
+            return;
+        }
+
         Thread t = new Thread() {
 
             @Override()
@@ -507,10 +512,10 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
                 // Try up to three times before bailing. Since the script aborts on first error, little overhead
                 // for trying multiple times
                 final int MAX_ATTEMPTS = 3;
-                
+
                 ATTEMPT:
                 for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-                    
+
                     Status s = performInjection(bytes, hash, isMetaData, uzf);
 
                     switch (s) {
@@ -539,7 +544,7 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
                     }
                 }
 
-                // If gets here, failed
+                // If gets here, failed.
                 isFailure[0] = true;
             }
 
@@ -571,7 +576,9 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
                 }
 
                 if (hostsToUse.size() < requiredCopies) {
-                    throw new RuntimeException("Require " + requiredCopies + " cop(ies) of chunk, but only " + hostsToUse.size() + " host(s) available.");
+                    String msg = "Require " + requiredCopies + " cop(ies) of chunk, but only " + hostsToUse.size() + " host(s) available.";
+                    System.err.println(msg);
+                    return Status.Failed;
                 }
 
                 Collections.shuffle(hostsToUse);
@@ -713,6 +720,38 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
             System.err.println("Failure of a chunk to inject is a critical error. Aborting. Note that application saves state, so restart the application.");
             exit(5);
         }
+    }
+
+    /**
+     * 
+     * @param bytes
+     * @param hash
+     * @param isMetaData
+     * @return
+     */
+    private static boolean isValidChunk(final byte[] bytes, final BigHash hash, final boolean isMetaData) {
+
+        try {
+            if (isMetaData) {
+
+                MetaData md = MetaData.createFromBytes(bytes);
+
+                if (md != null) {
+                    return true;
+                }
+            } else {
+                BigHash verifyHash = new BigHash(bytes);
+
+                // Bytes should match
+                if (verifyHash.equals(hash)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            // Nope
+        }
+
+        return false;
     }
 
     /**
