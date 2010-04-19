@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.proteomecommons.tranche.scripts.utils.ScriptsUtil;
+import org.tranche.util.Text;
 
 /**
  *
@@ -46,6 +47,7 @@ public class TrancheStatusTable {
         final int buildLen = 6;
         final int loadingLen = 0;
         final int fieldLen = 5;
+        final int availableSpaceLen = 15;
         String hr = null;
 
         final String offlineFlag = "X",  notInTable = "-",  writableFlag = "w",  readableFlag = "r",  fullHashSpanFlag = "f",  fullTargetHashSpanFlag = "t";
@@ -78,6 +80,9 @@ public class TrancheStatusTable {
                 hrBuf.append("-");
             }
             for (int i = 0; i < loadingLen + 1; i++) {
+                hrBuf.append("-");
+            }
+            for (int i = 0; i < availableSpaceLen + 1; i++) {
                 hrBuf.append("-");
             }
             for (Integer nextKey : keys.keySet()) {
@@ -120,6 +125,19 @@ public class TrancheStatusTable {
             {
                 final String label = "Loading ";
                 final int keyDiff = buildLen - label.length();
+
+                StringBuffer header = new StringBuffer();
+                header.append(label);
+                for (int i = 0; i < keyDiff; i++) {
+                    header.append(" ");
+                }
+                System.out.print("|" + header.toString());
+            }
+
+            // Print out header for available space
+            {
+                final String label = "Available";
+                final int keyDiff = availableSpaceLen - label.length();
 
                 StringBuffer header = new StringBuffer();
                 header.append(label);
@@ -196,9 +214,27 @@ public class TrancheStatusTable {
                     System.out.print("| yes    ");
 
                 } else {
-                    
+
                     System.out.print("| -      ");
                 }
+            }
+
+            // Print out available space
+            {
+                StringBuffer buf = new StringBuffer();
+                
+                // If not writeable, just put -
+                if (!row.isAdminWritabled) {
+                    buf.append("-");
+                } else {
+                    buf.append(Text.getFormattedBytes(row.diskSpace-row.diskSpaceUsed));
+                }
+
+                while (buf.length() < availableSpaceLen) {
+                    buf.append(" ");
+                }
+
+                System.out.print("|" + buf);
             }
 
             for (Integer nextKey : keyList) {
