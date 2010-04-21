@@ -47,7 +47,7 @@ public class ReplicationCountScript {
     // vars for this run
     public static String post = null;
     public static boolean checkPC = false;
-    public static boolean randomize = true;
+    public static boolean randomize = false;
     public static boolean replicate = false;
     public static int replicationsRequired = 3;
     public static String pc_user = null;
@@ -82,7 +82,7 @@ public class ReplicationCountScript {
             System.out.println("  -p admin_pass                Optional when \"-r false\" else required. Sets the ProteomeCommons.org Tranche repository admin passphrase.");
             System.out.println("  -P pc_user_pass              Optional when \"-e false\" else required.");
             System.out.println("  -r true/false                Optional. Flag whether to check the ProteomeCommons.org Tranche repository. Default false.");
-            System.out.println("  -R true/false                Optional. Flag whether to randomize the selection of hashes. Default true.");
+            System.out.println("  -R true/false                Optional. Flag whether to randomize the selection of hashes. Default false.");
             System.out.println("  -t file                      Optional. More than one can be added. Location of a tab separated value file to use as a list of projects to check. Must be in format: \"hash\\tpassphrase\\n\" for each line.");
             System.out.println("  -u admin_user                Optional when \"-r false\" else required. Sets the ProteomeCommons.org Tranche repository admin user.");
             System.out.println("  -U pc_user                   Optional when \"-e false\" else required.");
@@ -332,6 +332,7 @@ public class ReplicationCountScript {
     private static void run(ArrayList<File> tsvFiles, ArrayList<File> csvFiles, boolean checkPC, String tagsUser, String tagsPass, String post, boolean randomize, ArrayList<String> hashesStartWith) throws Exception {
         // get the list of projects - recheck every loop
         HashMap<BigHash, String> projects = new HashMap<BigHash, String>();
+        LinkedList<BigHash> hashes = new LinkedList<BigHash>();
         for (File file : tsvFiles) {
             FileReader fr = null;
             BufferedReader br = null;
@@ -351,10 +352,12 @@ public class ReplicationCountScript {
                         }
                         if (hashesStartWith.size() == 0) {
                             projects.put(hash, passphrase);
+                            hashes.add(hash);
                         } else {
                             for (String startWith : hashesStartWith) {
                                 if (hash.toString().startsWith(startWith)) {
                                     projects.put(hash, passphrase);
+                                    hashes.add(hash);
                                     break;
                                 }
                             }
@@ -391,10 +394,12 @@ public class ReplicationCountScript {
                         }
                         if (hashesStartWith.size() == 0) {
                             projects.put(hash, passphrase);
+                            hashes.add(hash);
                         } else {
                             for (String startWith : hashesStartWith) {
                                 if (hash.toString().startsWith(startWith)) {
                                     projects.put(hash, passphrase);
+                                    hashes.add(hash);
                                     break;
                                 }
                             }
@@ -432,10 +437,12 @@ public class ReplicationCountScript {
                         }
                         if (hashesStartWith.size() == 0) {
                             projects.put(hash, passphrase);
+                            hashes.add(hash);
                         } else {
                             for (String startWith : hashesStartWith) {
                                 if (hash.toString().startsWith(startWith)) {
                                     projects.put(hash, passphrase);
+                                    hashes.add(hash);
                                     break;
                                 }
                             }
@@ -455,13 +462,10 @@ public class ReplicationCountScript {
         }
         for (BigHash hash : hashesToCheck) {
             projects.put(hash, "");
+            hashes.add(hash);
         }
 
         // make a collection of hashes
-        LinkedList<BigHash> hashes = new LinkedList<BigHash>();
-        for (BigHash hash : projects.keySet()) {
-            hashes.add(hash);
-        }
         if (randomize) {
             Collections.shuffle(hashes);
         }
