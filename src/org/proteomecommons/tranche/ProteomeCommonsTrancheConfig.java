@@ -17,6 +17,7 @@ package org.proteomecommons.tranche;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import org.tranche.commons.DebugUtil;
 import org.tranche.gui.ConfigureTrancheGUI;
 
 /**
@@ -26,6 +27,9 @@ import org.tranche.gui.ConfigureTrancheGUI;
  */
 public class ProteomeCommonsTrancheConfig {
 
+    /**
+     * 
+     */
     public static final String CONFIG_FILE_LOCATION = "/org/proteomecommons/tranche/pc-tranche.conf";
     private static boolean loaded = false;
 
@@ -38,6 +42,7 @@ public class ProteomeCommonsTrancheConfig {
             return;
         }
         loaded = true;
+        DebugUtil.debugOut(ProteomeCommonsTrancheConfig.class, "Loading configuration from " + CONFIG_FILE_LOCATION);
         ConfigureTrancheGUI.load(CONFIG_FILE_LOCATION);
     }
 
@@ -54,9 +59,11 @@ public class ProteomeCommonsTrancheConfig {
                 try {
                     argList.add(arg);
                 } catch (Exception e) {
+                    DebugUtil.debugErr(ProteomeCommonsTrancheConfig.class, e);
                 }
             }
         } catch (Exception e) {
+            DebugUtil.debugErr(ProteomeCommonsTrancheConfig.class, e);
         }
         return argList.toArray(new String[0]);
     }
