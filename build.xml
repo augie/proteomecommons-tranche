@@ -258,7 +258,7 @@
             </patternset>
         </unzip>
         <delete file="${tranche-commons.jar}"/>
-        <zip destfile="${tranche-commons.jar}" basedigr="${tranche-commons}"/>
+        <zip destfile="${tranche-commons.jar}" basedir="${tranche-commons}"/>
         <delete dir="${tranche-commons}"/>
         <signjar jar="${tranche-commons.jar}" alias="${keystoreAlias}" keystore="${keystore}" storepass="${keystorePassword}"/>
     </target>
