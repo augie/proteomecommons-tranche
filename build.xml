@@ -247,9 +247,9 @@
         <delete dir="${tranche-gui}"/>
         <signjar jar="${tranche-gui.jar}" alias="${keystoreAlias}" keystore="${keystore}" storepass="${keystorePassword}"/>
 
-        <property name="tranche-conf.jar" value="${dist.lib}/tranche-conf.jar" />
-        <property name="tranche-conf" value="${dist.lib}/tranche-conf" />
-        <unzip src="${tranche-conf.jar}" dest="${tranche-conf}">
+        <property name="tranche-commons.jar" value="${dist.lib}/tranche-commons.jar" />
+        <property name="tranche-commons" value="${dist.lib}/tranche-commons" />
+        <unzip src="${tranche-commons.jar}" dest="${tranche-commons}">
             <patternset>
                 <exclude name="**/*.RSA"/>
                 <exclude name="**/*.rsa"/>
@@ -257,24 +257,9 @@
                 <exclude name="**/*.SF"/>
             </patternset>
         </unzip>
-        <delete file="${tranche-conf.jar}"/>
-        <zip destfile="${tranche-conf.jar}" basedigr="${tranche-conf}"/>
-        <delete dir="${tranche-conf}"/>
-        <signjar jar="${tranche-conf.jar}" alias="${keystoreAlias}" keystore="${keystore}" storepass="${keystorePassword}"/>
-
-        <property name="tranche-debug.jar" value="${dist.lib}/tranche-debug.jar" />
-        <property name="tranche-debug" value="${dist.lib}/tranche-debug" />
-        <unzip src="${tranche-debug.jar}" dest="${tranche-debug}">
-            <patternset>
-                <exclude name="**/*.RSA"/>
-                <exclude name="**/*.rsa"/>
-                <exclude name="**/*.sf"/>
-                <exclude name="**/*.SF"/>
-            </patternset>
-        </unzip>
-        <delete file="${tranche-debug.jar}"/>
-        <zip destfile="${tranche-debug.jar}" basedir="${tranche-debug}"/>
-        <delete dir="${tranche-debug}"/>
-        <signjar jar="${tranche-debug.jar}" alias="${keystoreAlias}" keystore="${keystore}" storepass="${keystorePassword}"/>
+        <delete file="${tranche-commons.jar}"/>
+        <zip destfile="${tranche-commons.jar}" basedigr="${tranche-commons}"/>
+        <delete dir="${tranche-commons}"/>
+        <signjar jar="${tranche-commons.jar}" alias="${keystoreAlias}" keystore="${keystore}" storepass="${keystorePassword}"/>
     </target>
 </project>
