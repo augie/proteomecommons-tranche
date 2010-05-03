@@ -8,12 +8,12 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import org.proteomecommons.tranche.ProteomeCommonsTrancheConfig;
+import org.tranche.commons.TextUtil;
 import org.tranche.flatfile.DataBlockUtil;
 import org.tranche.flatfile.DataDirectoryConfiguration;
 import org.tranche.flatfile.ProjectFindingThread;
 import org.tranche.hash.BigHash;
 import org.tranche.util.IOUtil;
-import org.tranche.util.Text;
 
 /**
  *
@@ -93,7 +93,7 @@ public class MergeDDCsScript {
                 // Load each input DDCs
                 for (String in : inputDDCs) {
                     final long start = System.currentTimeMillis();
-                    System.out.println("Starting: " + in + " (" + Text.getFormattedDate(start) + ")");
+                    System.out.println("Starting: " + in + " (" + TextUtil.getFormattedDate(start) + ")");
 
                     DataBlockUtil inputDBU = null;
                     try {
@@ -188,7 +188,7 @@ public class MergeDDCsScript {
             System.out.println("dataChunksAdded = " + dataChunksAdded + ", dataChunksSkipped = " + dataChunksSkipped + ", dataChunksError = " + dataChunksError);
             System.out.println("metaChunksAdded = " + metaChunksAdded + ", metaChunksSkipped = " + metaChunksSkipped + ", metaChunksError = " + metaChunksError);
             System.out.println();
-            System.out.println("~ fin, process ran for " + Text.getPrettyEllapsedTimeString(System.currentTimeMillis() - processStart) + " ~");
+            System.out.println("~ fin, process ran for " + TextUtil.getEllapsedTimeString(System.currentTimeMillis() - processStart) + " ~");
         }
     }
 
@@ -199,7 +199,7 @@ public class MergeDDCsScript {
      */
     private static void printEllapsedMessage(String msg, long start) {
         long delta = System.currentTimeMillis() - start;
-        System.out.println("    " + Text.getPrettyEllapsedTimeString(delta) + ": " + msg);
+        System.out.println("    " + TextUtil.getEllapsedTimeString(delta) + ": " + msg);
     }
 
     /**

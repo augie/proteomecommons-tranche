@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Set;
 import org.proteomecommons.tranche.ProteomeCommonsTrancheConfig;
 import org.tranche.TrancheServer;
+import org.tranche.commons.RandomUtil;
+import org.tranche.commons.TextUtil;
 import org.tranche.hash.BigHash;
 import org.tranche.network.*;
 import org.tranche.server.PropagationExceptionWrapper;
@@ -16,8 +18,6 @@ import org.tranche.server.PropagationReturnWrapper;
 import org.tranche.users.UserZipFile;
 import org.tranche.users.UserZipFileUtil;
 import org.tranche.util.IOUtil;
-import org.tranche.util.RandomUtil;
-import org.tranche.util.Text;
 
 /**
  *
@@ -81,14 +81,14 @@ public class TestServerForIssuesScript {
                 long total = System.currentTimeMillis() - start;
 
                 if (prw.isAnyErrors()) {
-                    System.err.println("    Failed to upload chunk #" + (i + 1) + " of " + chunksToWrite+", "+Text.getFormattedBytes(bytes.length)+". Took: "+Text.getPrettyEllapsedTimeString(total));
+                    System.err.println("    Failed to upload chunk #" + (i + 1) + " of " + chunksToWrite+", "+TextUtil.formatBytes(bytes.length)+". Took: "+TextUtil.getEllapsedTimeString(total));
 
                     for (PropagationExceptionWrapper pew : prw.getErrors()) {
                         System.err.println("        - " + pew.exception.getClass().getSimpleName() + ": " + pew.exception.getMessage());
                     }
 
                 } else {
-                    System.out.println("    Wrote chunk #" + (i + 1) + " of " + chunksToWrite + ", " + Text.getFormattedBytes(bytes.length) + ". Took: " + Text.getPrettyEllapsedTimeString(total));
+                    System.out.println("    Wrote chunk #" + (i + 1) + " of " + chunksToWrite + ", " + TextUtil.formatBytes(bytes.length) + ". Took: " + TextUtil.getEllapsedTimeString(total));
                 }
 
 
@@ -168,7 +168,7 @@ public class TestServerForIssuesScript {
 
             } else {
                 chunk = ((byte[][]) prw.getReturnValueObject())[0];
-                System.out.println("    Downloaded chunk #" + count + " of " + hashesToSave.size() + ", " + Text.getFormattedBytes(chunk.length));
+                System.out.println("    Downloaded chunk #" + count + " of " + hashesToSave.size() + ", " + TextUtil.formatBytes(chunk.length));
             }
         }
     }

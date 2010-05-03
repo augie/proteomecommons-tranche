@@ -18,10 +18,9 @@ import org.proteomecommons.tranche.scripts.status.NetworkInformation;
 import org.proteomecommons.tranche.scripts.status.StatusUtil;
 import org.proteomecommons.tranche.scripts.status.TrancheStatusTableRow;
 import org.tranche.ConfigureTranche;
-import org.tranche.time.TimeUtil;
+import org.tranche.commons.TextUtil;
 import org.tranche.util.EmailUtil;
 import org.tranche.util.IOUtil;
-import org.tranche.util.Text;
 
 /**
  *
@@ -118,23 +117,23 @@ public class EmailNetworkChangesScript {
 
                 if (optionalMessage != null) {
                     message.append(optionalMessage);
-                    message.append(Text.getNewLine());
-                    message.append(Text.getNewLine());
+                    message.append(TextUtil.getNewLine());
+                    message.append(TextUtil.getNewLine());
                 }
 
                 if (hostsWentOffline.size() > 0) {
-                    message.append("Disappeared: " + Text.getCommaSeparatedString(hostsWentOffline));
-                    message.append(Text.getNewLine());
-                    message.append(Text.getNewLine());
+                    message.append("Disappeared: " + TextUtil.getCommaSeparatedString(hostsWentOffline));
+                    message.append(TextUtil.getNewLine());
+                    message.append(TextUtil.getNewLine());
                 }
                 if (hostsNewlyOnline.size() > 0) {
-                    message.append("Appeared: " + Text.getCommaSeparatedString(hostsNewlyOnline));
-                    message.append(Text.getNewLine());
-                    message.append(Text.getNewLine());
+                    message.append("Appeared: " + TextUtil.getCommaSeparatedString(hostsNewlyOnline));
+                    message.append(TextUtil.getNewLine());
+                    message.append(TextUtil.getNewLine());
                 }
 
                 StringBuffer subject = new StringBuffer();
-                subject.append(Text.getFormattedDateSimple(System.currentTimeMillis())+": PC.org-T server(s) ");
+                subject.append(TextUtil.getFormattedDateSimple(System.currentTimeMillis())+": PC.org-T server(s) ");
 
                 if (hostsWentOffline.size() > 0 && hostsNewlyOnline.size() > 0) {
                     subject.append("changes");
@@ -144,8 +143,8 @@ public class EmailNetworkChangesScript {
                     subject.append("came online");
                 }
 
-                System.out.println("Subject: " + Text.getNewLine() + subject);
-                System.out.println("Message: " + Text.getNewLine() + message);
+                System.out.println("Subject: " + TextUtil.getNewLine() + subject);
+                System.out.println("Message: " + TextUtil.getNewLine() + message);
 
                 EmailUtil.sendEmail(subject.toString(), emailAddresses.toArray(new String[0]), message.toString());
 

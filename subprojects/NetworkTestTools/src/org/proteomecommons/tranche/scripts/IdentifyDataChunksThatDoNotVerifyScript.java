@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 import org.proteomecommons.tranche.ProteomeCommonsTrancheConfig;
+import org.tranche.commons.TextUtil;
 import org.tranche.configuration.ConfigKeys;
 import org.tranche.configuration.Configuration;
 import org.tranche.flatfile.DataDirectoryConfiguration;
@@ -18,7 +19,6 @@ import org.tranche.flatfile.FlatFileTrancheServer;
 import org.tranche.hash.*;
 import org.tranche.network.NetworkUtil;
 import org.tranche.util.IOUtil;
-import org.tranche.util.Text;
 
 /**
  *
@@ -105,7 +105,7 @@ public class IdentifyDataChunksThatDoNotVerifyScript implements TrancheScript {
 
                 ffts.waitToLoadExistingDataBlocks();
 
-                System.out.println("... finished waiting for data directories to load, took: " + Text.getPrettyEllapsedTimeString(System.currentTimeMillis() - start));
+                System.out.println("... finished waiting for data directories to load, took: " + TextUtil.getEllapsedTimeString(System.currentTimeMillis() - start));
 
                 System.out.println("----------------------------------------------------------------------------------------------------------------------------------------------------");
                 BigInteger offset = BigInteger.ZERO;

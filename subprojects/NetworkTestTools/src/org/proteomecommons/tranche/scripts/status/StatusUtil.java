@@ -6,6 +6,7 @@ package org.proteomecommons.tranche.scripts.status;
 
 import org.proteomecommons.tranche.ProteomeCommonsTrancheConfig;
 import org.tranche.TrancheServer;
+import org.tranche.commons.TextUtil;
 import org.tranche.configuration.ConfigKeys;
 import org.tranche.configuration.Configuration;
 import org.tranche.configuration.ServerModeFlag;
@@ -19,7 +20,6 @@ import org.tranche.network.StatusTableRow;
 import org.tranche.security.SecurityUtil;
 import org.tranche.server.GetNetworkStatusItem;
 import org.tranche.util.IOUtil;
-import org.tranche.util.Text;
 
 /**
  *
@@ -160,7 +160,7 @@ public class StatusUtil {
                 for (DataDirectoryConfiguration ddc : config.getDataDirectories()) {
 
                     if (isPrintOutInformation) {
-                        System.out.println("    * " + ddc.getDirectory() + ": " + Text.getFormattedBytes(ddc.getSizeLimit()));
+                        System.out.println("    * " + ddc.getDirectory() + ": " + TextUtil.formatBytes(ddc.getSizeLimit()));
                     }
                     thisServerLimit += ddc.getSizeLimit();
                     networkInfo.totalSizeLimit += ddc.getSizeLimit();

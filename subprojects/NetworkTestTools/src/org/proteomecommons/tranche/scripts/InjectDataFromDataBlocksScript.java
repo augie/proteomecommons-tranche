@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.lang.String;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import org.proteomecommons.tranche.ProteomeCommonsTrancheConfig;
 import org.tranche.TrancheServer;
+import org.tranche.commons.TextUtil;
 import org.tranche.configuration.ConfigKeys;
 import org.tranche.configuration.Configuration;
 import org.tranche.exceptions.UnexpectedEndOfDataBlockException;
@@ -34,7 +34,6 @@ import org.tranche.meta.*;
 import org.tranche.network.*;
 import org.tranche.users.*;
 import org.tranche.util.IOUtil;
-import org.tranche.util.Text;
 
 /**
  * <p>Given one or more data directories, inject everything to network using target hash span rules.</p>
@@ -229,7 +228,7 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
 
                 ffts.waitToLoadExistingDataBlocks();
 
-                System.out.println("... finished waiting for data directories to load, took: " + Text.getPrettyEllapsedTimeString(System.currentTimeMillis() - start));
+                System.out.println("... finished waiting for data directories to load, took: " + TextUtil.getEllapsedTimeString(System.currentTimeMillis() - start));
 
                 long dataChunkCount = 0, metaChunkCount = 0;
 
@@ -484,7 +483,6 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
     }
 
     static enum Status {
-
         Injected, Failed, Skipped
     };
 
@@ -509,9 +507,9 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
 
                 final String chunkType = isMetaData ? "meta data" : "data";
 
-                // Try up to three times before bailing. Since the script aborts on first error, little overhead
-                // for trying multiple times
-                final int MAX_ATTEMPTS = 3;
+                // Give it a lot of chances. Even if it takes 30 minutes to fail, not a big deal -- better
+                // than dying due to temporary problem!
+                final int MAX_ATTEMPTS = 30;
 
                 ATTEMPT:
                 for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
@@ -536,6 +534,12 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
 
                         case Failed:
                             System.err.println("FAILED: Attempt #" + attempt + " of " + MAX_ATTEMPTS + " for " + chunkType + " chunk: " + hash);
+
+                            try {
+                                // Sleep a bit. Hope the problem goes away!
+                                Thread.sleep(60 * 1000);
+                            } catch (InterruptedException nope) { /* continue */ }
+
                             continue ATTEMPT;
 
                         default:

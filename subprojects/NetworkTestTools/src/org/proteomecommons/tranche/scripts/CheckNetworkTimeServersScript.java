@@ -3,7 +3,7 @@ package org.proteomecommons.tranche.scripts;
 import java.util.List;
 import org.proteomecommons.tranche.ProteomeCommonsTrancheConfig;
 import org.tranche.ConfigureTranche;
-import org.tranche.debug.DebugUtil;
+import org.tranche.commons.DebugUtil;
 import org.tranche.time.TimeUtil;
 
 /**
@@ -13,6 +13,7 @@ import org.tranche.time.TimeUtil;
 public class CheckNetworkTimeServersScript {
 
     public static void main(String args[]) throws Exception {
+
         ProteomeCommonsTrancheConfig.load();
         DebugUtil.setDebug(TimeUtil.class, true);
         List<String> servers = ConfigureTranche.getList(ConfigureTranche.CATEGORY_NETWORK_TIME_SERVERS);

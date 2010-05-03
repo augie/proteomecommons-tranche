@@ -10,13 +10,13 @@ import java.util.Set;
 import org.proteomecommons.tranche.ProteomeCommonsTrancheConfig;
 import org.proteomecommons.tranche.scripts.TrancheScript;
 import org.tranche.TrancheServer;
+import org.tranche.commons.TextUtil;
 import org.tranche.get.GetFileTool;
 import org.tranche.hash.*;
 import org.tranche.meta.*;
 import org.tranche.network.*;
 import org.tranche.project.*;
 import org.tranche.time.*;
-import org.tranche.util.*;
 
 /**
  * <p>Used to identify projects with bad chunks.</p>
@@ -303,7 +303,7 @@ public class FindProjectsWithBadChunksScript implements TrancheScript {
             for (BigHash projectHash : projectHashes) {
                 count++;
                 System.out.println("Checking project #" + count + " of " + projectHashes.size() + ": " + projectHash);
-                System.out.println(tab + "Started: " + Text.getFormattedDate(TimeUtil.getTrancheTimestamp()));
+                System.out.println(tab + "Started: " + TextUtil.getFormattedDate(TimeUtil.getTrancheTimestamp()));
                 ATTEMPT:
                 for (int attempt = 0; attempt < maxAttempts; attempt++) {
                     try {

@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.proteomecommons.tranche.ProteomeCommonsTrancheConfig;
 import org.tranche.TrancheServer;
+import org.tranche.commons.TextUtil;
 import org.tranche.get.GetFileTool;
 import org.tranche.hash.BigHash;
 import org.tranche.meta.*;
@@ -18,7 +19,6 @@ import org.tranche.network.NetworkUtil;
 import org.tranche.network.StatusTableRow;
 import org.tranche.security.*;
 import org.tranche.time.*;
-import org.tranche.util.Text;
 
 /**
  * <p>Finds all project files on network that belong to user and prints out data set information for each.</p>
@@ -73,7 +73,7 @@ public class FindProjectFilesForUserScript implements TrancheScript {
             for (BigHash projectHash : projectHashes) {
                 count++;
                 if (count % 1000 == 0) {
-                    System.out.println("    ... finished "+count+" of "+projectHashes.size()+" projects: "+Text.getFormattedDate(TimeUtil.getTrancheTimestamp()));
+                    System.out.println("    ... finished "+count+" of "+projectHashes.size()+" projects: "+TextUtil.getFormattedDate(TimeUtil.getTrancheTimestamp()));
                 }
                 ATTEMPT:
                 for (int attempt = 0; attempt < maxAttempts; attempt++) {
@@ -144,7 +144,7 @@ public class FindProjectFilesForUserScript implements TrancheScript {
             System.out.println("    " + String.valueOf(uploader + 1) + ". " + metaData.getSignature().getUserName());
         }
         System.out.println();
-        System.out.println(" * " + metaData.getDataSetFiles() + " files, " + Text.getFormattedBytes(metaData.getDataSetSize()));
+        System.out.println(" * " + metaData.getDataSetFiles() + " files, " + TextUtil.formatBytes(metaData.getDataSetSize()));
         System.out.println();
         if (metaData.isEncrypted()) {
             if (metaData.isPublicPassphraseSet()) {

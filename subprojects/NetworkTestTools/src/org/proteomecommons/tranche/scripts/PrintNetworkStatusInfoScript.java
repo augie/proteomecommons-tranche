@@ -12,6 +12,7 @@ import org.proteomecommons.tranche.scripts.status.StatusUtil;
 import org.proteomecommons.tranche.scripts.status.TrancheStatusTableRow;
 import org.proteomecommons.tranche.scripts.utils.ScriptsUtil;
 import org.tranche.TrancheServer;
+import org.tranche.commons.TextUtil;
 import org.tranche.network.*;
 import org.tranche.util.*;
 
@@ -111,9 +112,9 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
         }
 
         System.out.println("                       Total                Used               Available");
-        System.out.println("    Total              " + Text.getFormattedBytes(writableTotal + nonWritableTotal) + "              " + Text.getFormattedBytes(writableUsed + nonWritableUsed) + "            " + Text.getFormattedBytes((writableTotal + nonWritableTotal) - (writableUsed + nonWritableUsed)));
-        System.out.println("    Non-writable (" + nonWritableCount + ")   " + Text.getFormattedBytes(nonWritableTotal) + "              " + Text.getFormattedBytes(nonWritableUsed) + "            " + Text.getFormattedBytes(nonWritableTotal - nonWritableUsed));
-        System.out.println("    Writable (" + writableCount + ")       " + Text.getFormattedBytes(writableTotal) + "                " + Text.getFormattedBytes(writableUsed) + "            " + Text.getFormattedBytes(writableTotal - writableUsed));
+        System.out.println("    Total              " + TextUtil.formatBytes(writableTotal + nonWritableTotal) + "              " + TextUtil.formatBytes(writableUsed + nonWritableUsed) + "            " + TextUtil.formatBytes((writableTotal + nonWritableTotal) - (writableUsed + nonWritableUsed)));
+        System.out.println("    Non-writable (" + nonWritableCount + ")   " + TextUtil.formatBytes(nonWritableTotal) + "              " + TextUtil.formatBytes(nonWritableUsed) + "            " + TextUtil.formatBytes(nonWritableTotal - nonWritableUsed));
+        System.out.println("    Writable (" + writableCount + ")       " + TextUtil.formatBytes(writableTotal) + "                " + TextUtil.formatBytes(writableUsed) + "            " + TextUtil.formatBytes(writableTotal - writableUsed));
 
         System.out.println();
 
@@ -125,7 +126,7 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
         System.out.println("    - Normal: " + networkInfo.getNumberOfWritableHashSpans() + " (at least)");
 
         System.out.println();
-        System.out.println("Total size limit: " + Text.getFormattedBytes(networkInfo.getTotalSizeLimit()));
+        System.out.println("Total size limit: " + TextUtil.formatBytes(networkInfo.getTotalSizeLimit()));
         System.out.println();
 
         if (isRegister) {

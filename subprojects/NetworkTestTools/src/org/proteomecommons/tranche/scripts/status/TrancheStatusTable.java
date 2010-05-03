@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.proteomecommons.tranche.scripts.utils.ScriptsUtil;
-import org.tranche.util.Text;
+import org.tranche.commons.TextUtil;
 
 /**
  *
@@ -232,7 +232,7 @@ public class TrancheStatusTable {
                 if (!row.isAdminWritabled) {
                     buf.append("-");
                 } else {
-                    buf.append(Text.getFormattedBytes(row.diskSpace - row.diskSpaceUsed));
+                    buf.append(TextUtil.formatBytes(row.diskSpace - row.diskSpaceUsed));
                 }
 
                 while (buf.length() < availableSpaceLen - 1) {
