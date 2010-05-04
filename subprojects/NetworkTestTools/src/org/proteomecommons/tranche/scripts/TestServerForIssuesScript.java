@@ -81,14 +81,14 @@ public class TestServerForIssuesScript {
                 long total = System.currentTimeMillis() - start;
 
                 if (prw.isAnyErrors()) {
-                    System.err.println("    Failed to upload chunk #" + (i + 1) + " of " + chunksToWrite+", "+TextUtil.formatBytes(bytes.length)+". Took: "+TextUtil.getEllapsedTimeString(total));
+                    System.err.println("    Failed to upload chunk #" + (i + 1) + " of " + chunksToWrite+", "+TextUtil.formatBytes(bytes.length)+". Took: "+TextUtil.formatTimeLength(total));
 
                     for (PropagationExceptionWrapper pew : prw.getErrors()) {
                         System.err.println("        - " + pew.exception.getClass().getSimpleName() + ": " + pew.exception.getMessage());
                     }
 
                 } else {
-                    System.out.println("    Wrote chunk #" + (i + 1) + " of " + chunksToWrite + ", " + TextUtil.formatBytes(bytes.length) + ". Took: " + TextUtil.getEllapsedTimeString(total));
+                    System.out.println("    Wrote chunk #" + (i + 1) + " of " + chunksToWrite + ", " + TextUtil.formatBytes(bytes.length) + ". Took: " + TextUtil.formatTimeLength(total));
                 }
 
 

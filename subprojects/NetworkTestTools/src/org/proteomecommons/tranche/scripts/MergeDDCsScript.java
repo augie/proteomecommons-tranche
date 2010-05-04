@@ -188,7 +188,7 @@ public class MergeDDCsScript {
             System.out.println("dataChunksAdded = " + dataChunksAdded + ", dataChunksSkipped = " + dataChunksSkipped + ", dataChunksError = " + dataChunksError);
             System.out.println("metaChunksAdded = " + metaChunksAdded + ", metaChunksSkipped = " + metaChunksSkipped + ", metaChunksError = " + metaChunksError);
             System.out.println();
-            System.out.println("~ fin, process ran for " + TextUtil.getEllapsedTimeString(System.currentTimeMillis() - processStart) + " ~");
+            System.out.println("~ fin, process ran for " + TextUtil.formatTimeLength(System.currentTimeMillis() - processStart) + " ~");
         }
     }
 
@@ -199,7 +199,7 @@ public class MergeDDCsScript {
      */
     private static void printEllapsedMessage(String msg, long start) {
         long delta = System.currentTimeMillis() - start;
-        System.out.println("    " + TextUtil.getEllapsedTimeString(delta) + ": " + msg);
+        System.out.println("    " + TextUtil.formatTimeLength(delta) + ": " + msg);
     }
 
     /**

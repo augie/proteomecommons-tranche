@@ -228,7 +228,7 @@ public class InjectDataFromDataBlocksScript implements TrancheScript {
 
                 ffts.waitToLoadExistingDataBlocks();
 
-                System.out.println("... finished waiting for data directories to load, took: " + TextUtil.getEllapsedTimeString(System.currentTimeMillis() - start));
+                System.out.println("... finished waiting for data directories to load, took: " + TextUtil.formatTimeLength(System.currentTimeMillis() - start));
 
                 long dataChunkCount = 0, metaChunkCount = 0;
 
