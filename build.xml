@@ -3,10 +3,10 @@
 
     <!-- Print out current date/time for log -->
     <tstamp><format property="BUILD_TIME" pattern="MM/dd/yyyy hh:mm aa" /></tstamp>
-    <echo message="Build on ${BUILD_TIME}" />
+    <echo message="Build on ${BUILD_TIME}"/>
     
     <!-- load properties from build.properties -->
-    <property file="build.properties" />
+    <property file="build.properties"/>
 
     <!-- set global properties for this build -->
     <property name="src" location="src"/>
