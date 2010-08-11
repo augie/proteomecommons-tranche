@@ -6,12 +6,12 @@
     <echo message="Build on ${BUILD_TIME}"/>
     
     <!-- load properties from build.properties -->
-    <property file="build.properties"/>
+    <property file="../build.properties"/>
 
     <!-- set global properties for this build -->
-    <property name="src" location="src"/>
-    <property name="lib"  location="lib"/>
-    <property name="build" location="b"/>
+    <property name="src" location="../src"/>
+    <property name="lib"  location="../lib"/>
+    <property name="build" location="../b"/>
     <property name="build.rt" location="${build}/rt"/>
     <property name="dist.files" location="${dist}/files"/>
     <property name="name.lib" value="lib"/>
@@ -21,16 +21,16 @@
     <property name="dist.zip" location="${dist}/pc-tranche-b${buildNumber}.zip"/>
 
     <!-- tools -->
-    <property name="dir.tools" location="build/tools"/>
+    <property name="dir.tools" location="../build/tools"/>
     <property name="build.tools" location="${build}/tools"/>
     <property name="dist.tools.zip" location="${dist}/pc-tranche-tools-b${buildNumber}.zip"/>
-    <property name="dir.server" location="build/server"/>
+    <property name="dir.server" location="../build/server"/>
     <property name="build.server.jar" location="${build.tools}/pc-tranche-server.jar"/>
-    <property name="dir.get" location="build/get"/>
+    <property name="dir.get" location="../build/get"/>
     <property name="build.get.jar" location="${build.tools}/pc-tranche-get.jar"/>
-    <property name="dir.add" location="build/add"/>
+    <property name="dir.add" location="../build/add"/>
     <property name="build.add.jar" location="${build.tools}/pc-tranche-add.jar"/>
-    <property name="dir.gui" location="build/gui"/>
+    <property name="dir.gui" location="../build/gui"/>
     <property name="build.gui.jar" location="${build.tools}/pc-tranche-gui.jar"/>
 
     <!-- path required for runtime compiling-->
