@@ -30,6 +30,7 @@ public class PrintNetworkStatusInfoScript implements TrancheScript {
      * @throws java.lang.Exception
      */
     public static void main(String[] args) throws Exception {
+        ProteomeCommonsTrancheConfig.load();
         try {
             printOnlineServerInfo(args);
         } catch (Exception e) {
