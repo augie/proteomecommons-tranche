@@ -478,7 +478,7 @@ public class ReplicationCountScript {
             // start a list of files to check
             int[] reps = new int[6];
             for (int i = 0; i <= 5; i++) {
-                reps[i] = Integer.valueOf(0);
+                reps[i] = 0;
             }
 
             ArrayList<BigHash> files = new ArrayList<BigHash>();
@@ -494,7 +494,7 @@ public class ReplicationCountScript {
                     md = gft.getMetaData();
                 } catch (Exception e) {
                     println("Could not download meta data for " + hash);
-                    report(post, hash, 1, 0, 0, 0, 0, 0);
+                    reps[0] = 1;
                     continue;
                 }
 
