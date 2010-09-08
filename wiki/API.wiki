@@ -1,0 +1,11 @@
+This page describes the process of interacting with the Proteome Commons Tranche repository programmatically.
+
+  # Download the stable build of the core JAR.
+  # Before interacting with the repository, execute the following command: `org.proteomecommons.tranche.ProteomeCommonsTrancheConfig.load();`
+  # Use one of the following code templates to interact with the repository.
+
+==Downloading==
+
+{{{
+
+}}}
