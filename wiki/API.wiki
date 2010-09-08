@@ -7,5 +7,7 @@ This page describes the process of interacting with the Proteome Commons Tranche
 ==Downloading==
 
 {{{
-
+GetFileTool gft = new GetFileTool();
+gft.setHash(BigHash.createHashFromString("replace this string with your hash"));
+gft.setSaveFile(new File("replace this string with the absolute file path"));
 }}}
