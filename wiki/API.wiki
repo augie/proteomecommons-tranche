@@ -6,8 +6,40 @@ This page describes the process of interacting with the Proteome Commons Tranche
 
 ==Downloading==
 
+The following code is sufficient to download a public data set (not passphrase-protected):
+
 {{{
 GetFileTool gft = new GetFileTool();
-gft.setHash(BigHash.createHashFromString("replace this string with your hash"));
-gft.setSaveFile(new File("replace this string with the absolute file path"));
+gft.setHash(BigHash.createHashFromString("hash"));
+gft.setSaveFile(new File("absolute file path"));
+gft.getDirectory();
+}}}
+
+The `getDirectory()` method can be replaced with the `getFile()` method. The methods work as they are named; which one should be used requires previous knowledge of the data set.
+
+The following line of code is required before the `execute()` method to download an encrypted data set:
+
+{{{
+gft.setPassphrase("passphrase");
+}}}
+
+==Uploading==
+
+The following code is sufficient to upload a public data set (not passphrase-protected):
+
+{{{
+AddFileTool aft = new AddFileTool();
+aft.setTitle("title");
+aft.setDescription("description");
+aft.setLicense(License.CC0);
+aft.setFile(new File("absolute file path"));
+aft.execute();
+}}}
+
+Replace `License.CC0` with the `new License(String title, String shortDescription, String description, boolean descriptionIsFile)` if you want to use a custom license.
+
+The following line of code is required before the execute() method to upload an encrypted data set:
+
+{{{
+aft.setPassphrase("passphrase");
 }}}
