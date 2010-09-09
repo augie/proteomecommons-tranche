@@ -11,7 +11,7 @@ The following code is sufficient to download a public data set (not passphrase-p
 {{{
 GetFileTool gft = new GetFileTool();
 gft.setHash(BigHash.createHashFromString("hash"));
-gft.setSaveFile(new File("absolute file path"));
+gft.setSaveFile(new File("absolute path"));
 gft.getDirectory();
 }}}
 
@@ -32,11 +32,14 @@ AddFileTool aft = new AddFileTool();
 aft.setTitle("title");
 aft.setDescription("description");
 aft.setLicense(License.CC0);
-aft.setFile(new File("absolute file path"));
+UserZipFile user = UserZipFileUtil.getUserZipFile("proteome commons user name", "proteome commons password");
+aft.setUserCertificate(user.getCertificate());
+aft.setUserPrivateKey(user.getPrivateKey());
+aft.setFile(new File("absolute path of file/directory to upload"));
 aft.execute();
 }}}
 
-Replace `License.CC0` with the `new License(String title, String shortDescription, String description, boolean descriptionIsFile)` if you want to use a custom license.
+Replace `License.CC0` with `new License("title", "brief description", "complete description", false)` if you want to use a custom license.
 
 The following line of code is required before the execute() method to upload an encrypted data set:
 
