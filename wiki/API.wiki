@@ -17,7 +17,7 @@ gft.getDirectory();
 
 The `getDirectory()` method can be replaced with the `getFile()` method. The methods work as they are named; which one should be used requires previous knowledge of the data set.
 
-The following line of code is required before the `execute()` method to download an encrypted data set:
+The following line of code is required before the `getFile()` or `getDirectory()` method to download an encrypted data set:
 
 {{{
 gft.setPassphrase("passphrase");
@@ -41,7 +41,7 @@ aft.execute();
 
 Replace `License.CC0` with `new License("title", "brief description", "complete description", false)` if you want to use a custom license.
 
-The following line of code is required before the execute() method to upload an encrypted data set:
+The following line of code is required before the `execute()` method to upload an encrypted data set:
 
 {{{
 aft.setPassphrase("passphrase");
