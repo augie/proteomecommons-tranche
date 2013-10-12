@@ -39,7 +39,7 @@ import org.tranche.util.TempFileUtil;
 
 /**
  *
- * @author James "Augie" Hill - augie@828productions.com
+ * @author James "Augie" Hill - augie@umich.edu
  */
 public class ReplicationCountScript {
 

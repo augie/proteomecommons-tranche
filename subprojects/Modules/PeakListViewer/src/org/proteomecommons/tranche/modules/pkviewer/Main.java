@@ -26,7 +26,7 @@ import org.tranche.modules.TrancheModuleAnnotation;
 
 /**
  *
- * @author James "Augie" Hill - augie@828productions.com
+ * @author James "Augie" Hill - augie@umich.edu
  */
 @TrancheModuleAnnotation(name = "Peak List Viewer Module", description = "")
 public class Main {
