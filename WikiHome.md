@@ -1,0 +1,3 @@
+This is the wiki for the Proteome Commons Tranche distributed repository. Use the menu on the left to find what you're looking for. The [Proteome Commons distributed repository](https://proteomecommons.org/tranche) is a configured Tranche repository specifically used for the sharing of proteome (and some related) files. If you're looking to make your own repository, you're in the wrong place, and will want to check out the [Tranche wiki](http://code.google.com/p/tranche/wiki/WikiHome).
+
+Rather than duplicating a lot of information, most of this wiki will be forwarding you to the proper wiki page on the [Tranche wiki](http://code.google.com/p/tranche/wiki/WikiHome).

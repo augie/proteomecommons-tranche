@@ -1,0 +1,3 @@
+You can download the command line tools in a ZIP file from the Downloads section. Read the included **README.txt** file for more information on how to use the tools.
+
+The command line tools you are downloading are pre-configured to use only the Proteome Commons Tranche repository. You will not be able to use the downloads from this project without any other Tranche repositories. To get the command line tools that can be used with any repository, go to the [Tranche wiki](http://code.google.com/p/tranche/wiki/CommandLineTools).

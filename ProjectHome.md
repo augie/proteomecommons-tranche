@@ -1,0 +1,7 @@
+This project is dedicated to the configuration files and subprojects of the Tranche repository for [Proteome Commons](https://proteomecommons.org/tranche), a distributed file repository for the storage and dissemination of proteomics and related files. For more information on the Tranche distributed repository software, visit [the Tranche Project web site](https://trancheproject.org).
+
+### Participate ###
+We're always looking for institutions and organizations to host servers. Especially if your group uploads lots of data to the repository, please consider contributing to the community. Our new configuration of servers give more than 40 TB raw capacity at a hardware cost of less than $15k (does not include electricity and bandwidth costs, which vary). Contact the [development group](http://groups.google.com/group/proteomecommons-tranche-dev) to discuss setting up a server for the Proteome Commons Tranche repository.
+
+### Origin ###
+Tranche started as part of Jayson Falkner's PhD work at the University of Michigan in 2005. The work was done as part of the National Resource for Proteomics and Pathways (Grant #P41 RR018627), directed by Philip C. Andrews. Since Jayson graduated in 2008, the software has been developed by a small full-time team at the University of Michigan.
